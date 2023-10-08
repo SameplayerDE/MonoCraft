@@ -4,13 +4,6 @@ using System.Net.Sockets;
 Client client = new Client("localhost", 25565);
 client.Connect();
 
-float _yaw = 0;
-float _pitch = 0;
-
-double _x = 0;
-double _y = 0;
-double _z = 0;
-
 int packetLength = 0;
 int packetId = -1;
 int count = 0;
@@ -53,30 +46,6 @@ var receiveTask = Task.Run(async () =>
                 {
                     Console.WriteLine("chat-message from server");
 
-                    using (var stream = new MemoryStream())
-                    {
-                        client.WriteVarInt(stream, 26);
-                        client.WriteVarInt(stream, 0x12);
-                        client.WriteDouble(stream, _x);
-                        client.WriteDouble(stream, _y);
-                        client.WriteDouble(stream, _z);
-                        //client.WriteFloat(stream, _yaw);
-                        //client.WriteFloat(stream, _pitch);
-                        client.WriteBoolean(stream, true);
-
-                        Console.WriteLine("{0},{1},{2} : {3},{4}", _x, _y, _z, _yaw, _pitch);
-
-                        client.GetStream().Write(stream.ToArray());
-                        client.GetStream().Flush();
-
-                        //var task = client.SendDataAsync(stream.ToArray());
-                        //if (task.IsCompleted)
-                        //{
-                        //    client.GetStream().Flush();
-                        //}
-
-                        //client.OutQueue.Enqueue(stream.ToArray());
-                    }
 
                 }
 
@@ -90,17 +59,7 @@ var receiveTask = Task.Run(async () =>
                     float yaw = client.ReadFloat(memoryStream); // yaw
                     float pitch = client.ReadFloat(memoryStream); // pitch
                     byte flags = client.ReadUnsignedByte(memoryStream); // flags
-
-                    _x = x;
-                    _y = y;
-                    _z = z;
-                    _yaw = yaw;
-                    _pitch = pitch;
-
-                    Console.WriteLine("{0},{1},{2} : {3},{4}", _x, _y, _z, _yaw, _pitch);
-                    string binaryFlags = Convert.ToString(flags, 2);
-                    Console.WriteLine(binaryFlags);
-
+                    
                     var stream = new MemoryStream();
                     client.WriteVarInt(stream, 2);
                     client.WriteVarInt(stream, 0x00);

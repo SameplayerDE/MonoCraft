@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleClient", "ConsoleCli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoCraft.Net", "MonoCraft.Net\MonoCraft.Net.csproj", "{9EF80D94-6059-4ECF-816D-6B57715059DB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoCraft.Application", "MonoCraft.Application\MonoCraft.Application.csproj", "{75572937-5B45-4CF8-BD8F-B5CD7F804370}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoCraft.Core", "MonoCraft.Core\MonoCraft.Core.csproj", "{0954C6EC-0051-41CC-AED3-51E63666FBAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{9EF80D94-6059-4ECF-816D-6B57715059DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EF80D94-6059-4ECF-816D-6B57715059DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EF80D94-6059-4ECF-816D-6B57715059DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75572937-5B45-4CF8-BD8F-B5CD7F804370}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75572937-5B45-4CF8-BD8F-B5CD7F804370}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75572937-5B45-4CF8-BD8F-B5CD7F804370}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75572937-5B45-4CF8-BD8F-B5CD7F804370}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0954C6EC-0051-41CC-AED3-51E63666FBAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0954C6EC-0051-41CC-AED3-51E63666FBAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0954C6EC-0051-41CC-AED3-51E63666FBAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0954C6EC-0051-41CC-AED3-51E63666FBAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
