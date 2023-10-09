@@ -81,7 +81,15 @@ namespace MonoCraft.Net
         public static void WriteEntityMetadata(this Stream stream, long value) { throw new NotImplementedException(); }
         public static void WriteSlot(this Stream stream, long value) { throw new NotImplementedException(); }
         public static void WriteNBTag(this Stream stream, long value) { throw new NotImplementedException(); }
-        public static void WritePosition(this Stream stream, long value) { throw new NotImplementedException(); }
+        public static void WritePosition(this Stream stream, int x, int y, int z)
+        {
+            long result = ((x & 0x3FFFFFFL) << 38) | ((z & 0x3FFFFFFL) << 12) | (y & 0xFFF);
+            byte[] byteArray = BitConverter.GetBytes(result);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(byteArray);
+            }
+        }
         public static void WriteAngle(this Stream stream, long value) { throw new NotImplementedException(); }
         public static void WriteUUID(this Stream stream, long value) { throw new NotImplementedException(); }
 
@@ -156,7 +164,61 @@ namespace MonoCraft.Net
         public static long ReadEntityMetadata(this Stream stream) { throw new NotImplementedException(); }
         public static long ReadSlot(this Stream stream) { throw new NotImplementedException(); }
         public static long ReadNBTag(this Stream stream) { throw new NotImplementedException(); }
-        public static long ReadPosition(this Stream stream) { throw new NotImplementedException(); }
+        public static (int, int, int) ReadPosition(this Stream stream)
+        {
+            byte[] data = stream.ReadBytes(8);
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < data.Length; i++)
+            {
+                builder.Append($"{data[i]:x2}");
+            }
+
+            ulong var = Convert.ToUInt64(builder.ToString(), 16);
+
+            ulong x = var & 0xFFFFFFC000000000;
+            ulong y = var & 0x3FFFFFF000;
+            ulong z = var & 0xFFF;
+
+            int o_x;
+            int o_y;
+            int o_z;
+
+            x = x >> 38;
+            if ((x & 0x2000000) > 0)
+            {
+                x = x ^ 0x3FFFFFF;
+                o_x = -Convert.ToInt32(x);
+            }
+            else
+            {
+                o_x = Convert.ToInt32(x);
+            }
+
+
+            y = y >> 12;
+            if ((y & 0x2000000) > 0)
+            {
+                y = y ^ 0x3FFFFFF;
+                o_y = -Convert.ToInt32(y);
+            }
+            else
+            {
+                o_y = Convert.ToInt32(y);
+            }
+
+            if ((z & 0x800) > 0)
+            {
+                z = z ^ 0xFFF;
+                o_z = -Convert.ToInt32(z);
+            }
+            else
+            {
+                o_z = Convert.ToInt32(z);
+            }
+
+            Console.WriteLine($"x: {o_x}/ y: {o_z} / z: {o_y}");
+            return (o_x, o_z, o_y);
+        }
         public static long ReadAngle(this Stream stream) { throw new NotImplementedException(); }
         public static long ReadUUID(this Stream stream) { throw new NotImplementedException(); }
         public static byte[] ReadBytes(this Stream stream, int amount)
