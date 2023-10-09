@@ -1,84 +1,68 @@
 ﻿using ConsoleClient;
-using System.Net.Sockets;
+using System;
 
-Client client = new Client("localhost", 25565);
-client.Connect();
+NetClient client = new NetClient();
+client.OnConnectionEstablished += Init;
+//client.OnServerTick += () => client.Chat("Tick");
 
-int packetLength = 0;
-int packetId = -1;
-int count = 0;
+await client.ConnectAsync("localhost", 25565);
 
-var receiveTask = Task.Run(async () =>
+Player Player = client.Player;
+Random random = new Random();
+while (client.IsConnected)
 {
-    try
+    //var input = Console.ReadLine();
+    //if (string.IsNullOrEmpty(input))
+    //{
+    //    continue;
+    //}
+    //var parts = input.Split(' ');
+    //var command = parts[0];
+    //if (string.Equals(command, "dc"))
+    //{
+    //    await client.DisconnectAsync();
+    //}
+    //if (string.Equals(command, "sw0"))
+    //{
+    //    client.SwingArm(0);
+    //}
+    //if (string.Equals(command, "sw1"))
+    //{
+    //    client.SwingArm(1);
+    //}
+    //if (string.Equals(command, "chat"))
+    //{
+    //    if (parts.Length > 1)
+    //    {
+    //        client.Chat(string.Join(" ", parts[1..]));
+    //    }
+    //}
+    
+    if (Player == null)
     {
-        while (client.IsConnected)
-        {
-            if (client.Available > 0)
-            {
-                packetLength = client.ReadVarInt(client.Stream);
-                byte[] receivedData = await client.ReceiveDataAsync(packetLength);
-
-                MemoryStream memoryStream = new MemoryStream(receivedData);
-                packetId = client.ReadVarInt(memoryStream);
-                count++;
-
-                if (packetId == 0x1F)
-                {
-                    long keepAliveId = client.ReadLong(memoryStream);
-                    Console.WriteLine("keep-alive from server [{0}]", keepAliveId);
-
-                    var stream = new MemoryStream();
-                    client.WriteVarInt(stream, 0x09);
-                    client.WriteVarInt(stream, 0x10);
-                    client.WriteLong(stream, keepAliveId);
-
-                    //client.OutQueue.Enqueue(stream.ToArray());
-
-                    var task = client.SendDataAsync(stream.ToArray());
-                    if (task.IsCompleted)
-                    {
-                        client.GetStream().Flush();
-                    }
-                }
-
-                if (packetId == 0x0E)
-                {
-                    Console.WriteLine("chat-message from server");
-
-
-                }
-
-                if (packetId == 0x34)
-                {
-                    Console.WriteLine("position-look from server");
-
-                    double x = client.ReadDouble(memoryStream); // x
-                    double y = client.ReadDouble(memoryStream); // y
-                    double z = client.ReadDouble(memoryStream); // z
-                    float yaw = client.ReadFloat(memoryStream); // yaw
-                    float pitch = client.ReadFloat(memoryStream); // pitch
-                    byte flags = client.ReadUnsignedByte(memoryStream); // flags
-                    
-                    var stream = new MemoryStream();
-                    client.WriteVarInt(stream, 2);
-                    client.WriteVarInt(stream, 0x00);
-                    client.WriteVarInt(stream, client.ReadVarInt(memoryStream));
-
-                    //client.OutQueue.Enqueue(stream.ToArray());
-                    var task = client.SendDataAsync(stream.ToArray());
-                    if (task.IsCompleted)
-                    {
-                        client.GetStream().Flush();
-                    }
-
-                }
-            }
-        }
-    }catch(Exception e)
-    {
-        Console.WriteLine($"Error: {e}");
+        Player = client.Player;
+        continue;
     }
-});
 
-await Task.WhenAll(receiveTask);
+    Thread.Sleep(100);
+
+    Player.X += Player.VelX;
+    Player.Z += Player.VelZ;
+
+    if (Player.X + Player.VelX >= 24 || Player.X + Player.VelX <= -7)
+    {
+        Player.VelX *= -1;
+    }
+    if (Player.Z + Player.VelZ >= 24 || Player.Z + Player.VelZ <= -7)
+    {
+        Player.VelZ *= -1;
+    }
+    client.SendPosition(Player);
+
+}
+
+void Init()
+{
+    Console.WriteLine("connected to the server");
+}
+

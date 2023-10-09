@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ConsoleClient
 {
@@ -15,6 +8,7 @@ namespace ConsoleClient
 
         private Thread _receivingThread;
         private Thread _sendingThread;
+        private Thread _processThread;
 
         private Socket _client;
         private NetworkStream _stream;
@@ -112,7 +106,7 @@ namespace ConsoleClient
 
         private void SendingMethod(object? obj)
         {
-            
+
         }
 
         private void ReceivingMethod(object? obj)
