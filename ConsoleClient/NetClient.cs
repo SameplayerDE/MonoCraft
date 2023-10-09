@@ -1,5 +1,6 @@
 ﻿using MonoCraft.Net;
 using System.Collections.Concurrent;
+using System.Data;
 using System.Net;
 using System.Net.Sockets;
 
@@ -36,7 +37,8 @@ namespace ConsoleClient
 
         public Player Player;
 
-        private int _packetsToProcess = 0;
+        private Semaphore _packetsToProcess = new Semaphore(0, 1);
+        public object penis;
 
         public NetClient()
         {
@@ -90,27 +92,31 @@ namespace ConsoleClient
         {
             while (IsConnected)
             {
-
                 if (InQueue.Count > 0)
                 {
                     try
                     {
                         if (InQueue.TryDequeue(out var data))
                         {
+                            if (data == null)
+                            {
+                                continue;
+                            }
+
                             var packet = new MemoryStream(data);
                             int packetId = packet.ReadVarInt();
 
                             if (packetId == 0x1F)
                             {
                                 long keepAliveId = packet.ReadLong();
-                                Console.WriteLine("keep-alive from server [{0}]", keepAliveId);
+                                //Console.WriteLine("keep-alive from server [{0}]", keepAliveId);
                                 KeepAlive(keepAliveId);
                             }
 
                             if (packetId == 0x19)
                             {
                                 string reason = packet.ReadString();
-                                Console.WriteLine("disconnect from server [{0}]", reason);
+                                //Console.WriteLine("disconnect from server [{0}]", reason);
                             }
 
                             if (packetId == 0x0E)
@@ -138,7 +144,7 @@ namespace ConsoleClient
 
                                 SetPosition(x, y, z, yaw, pitch);
 
-                                Console.WriteLine("palyer-position-rotation from server [{0}]", teleportId);
+                                //Console.WriteLine("player-position-rotation from server [{0}]", teleportId);
 
                                 TeleportConfirm(teleportId);
                             }
@@ -147,14 +153,13 @@ namespace ConsoleClient
                             {
                                 long worldAge = packet.ReadLong();
                                 long timeOfDay = packet.ReadLong();
-                                Console.WriteLine("time-update from server [{0}, {1}]", worldAge, timeOfDay);
+                                //Console.WriteLine("time-update from server [{0}, {1}]", worldAge, timeOfDay);
 
                                 SendPosition(Player);
                                 OnServerTick?.Invoke();
                             }
 
                             packet.Dispose();
-                            _packetsToProcess--;
                         }
                     }
                     catch (Exception e)
@@ -164,16 +169,11 @@ namespace ConsoleClient
                         _socket.Disconnect(false);
                     }
                 }
+                else
+                {
+                    Thread.Sleep(1);
+                }
             }
-        }
-
-        private void SetPosition(double x, double y, double z, float yaw, float pitch)
-        {
-            Player.X = x;
-            Player.Y = y;
-            Player.Z = z;
-            Player.Yaw = yaw;
-            Player.Pitch = pitch;
         }
 
         private async void Send(object? obj)
@@ -200,10 +200,19 @@ namespace ConsoleClient
                     int packetLength = _networkStream.ReadVarInt();
                     var receivedData = await ReceiveDataAsync(packetLength);
                     InQueue.Enqueue(receivedData);
-                    _packetsToProcess++;
                 }
             }
         }
+
+        private void SetPosition(double x, double y, double z, float yaw, float pitch)
+        {
+            Player.X = x;
+            Player.Y = y;
+            Player.Z = z;
+            Player.Yaw = yaw;
+            Player.Pitch = pitch;
+        }
+
 
         public async Task SendDataAsync(byte[] data)
         {
