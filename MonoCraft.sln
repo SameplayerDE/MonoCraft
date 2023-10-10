@@ -50,5 +50,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Monocraft.Application.Shared\Monocraft.Application.Shared.projitems*{a0cdbd0e-3a41-42b7-9425-a838bc2c7383}*SharedItemsImports = 13
+		Monocraft.Application.Shared\Monocraft.Application.Shared.projitems*{a1476092-f534-499e-ac28-ceee19ad6b46}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

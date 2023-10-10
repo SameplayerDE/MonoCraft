@@ -19,4 +19,5 @@
     <Message Text="Restoring dotnet tools" Importance="High" />
     <Exec Command="dotnet tool restore" />
   </Target>
+  <Import Project="..\Monocraft.Application.Shared\Monocraft.Application.Shared.projitems" Label="Shared" />
 </Project>
