@@ -28,7 +28,7 @@ namespace Monocraft.Application.Shared
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            client.ConnectAsync("localhost", 25565);
+            client.ConnectAsync(Console.ReadLine(), 25565);
             PacketHandler.OnBlockChange += UpdateBlock;
             IsMouseVisible = true;
         }

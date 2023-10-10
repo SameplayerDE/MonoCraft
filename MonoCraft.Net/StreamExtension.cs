@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using MonoCraft.Net.Predefined.Datatypes;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace MonoCraft.Net
@@ -106,8 +107,12 @@ namespace MonoCraft.Net
                 Array.Reverse(byteArray);
             }
         }
-        public static void WriteAngle(this Stream stream, long value) { throw new NotImplementedException(); }
-        public static void WriteUUID(this Stream stream, long value) { throw new NotImplementedException(); }
+        public static void WritePosition(this Stream stream, Position position)
+        {
+            stream.WritePosition(position.X, position.Y, position.Z);
+        }
+        public static void WriteAngle(this Stream stream, sbyte value) { throw new NotImplementedException(); }
+        public static void WriteUUID(this Stream stream, Guid value) { throw new NotImplementedException(); }
 
         public static bool ReadBool(this Stream stream) { throw new NotImplementedException(); }
         public static sbyte ReadSignedByte(this Stream stream) { throw new NotImplementedException(); }
@@ -180,7 +185,7 @@ namespace MonoCraft.Net
         public static long ReadEntityMetadata(this Stream stream) { throw new NotImplementedException(); }
         public static long ReadSlot(this Stream stream) { throw new NotImplementedException(); }
         public static long ReadNBTag(this Stream stream) { throw new NotImplementedException(); }
-        public static (int, int, int) ReadPosition(this Stream stream)
+        public static (int, int, int) ReadPositionTuple(this Stream stream)
         {
             byte[] data = stream.ReadBytes(8);
             StringBuilder builder = new StringBuilder();
@@ -235,8 +240,14 @@ namespace MonoCraft.Net
             Console.WriteLine($"x: {o_x}/ y: {o_z} / z: {o_y}");
             return (o_x, o_z, o_y);
         }
-        public static long ReadAngle(this Stream stream) { throw new NotImplementedException(); }
-        public static long ReadUUID(this Stream stream) { throw new NotImplementedException(); }
+        public static Position ReadPosition(this Stream stream)
+        {
+            (int, int, int) positionTuple = stream.ReadPositionTuple();
+            (int x, int y, int z) = positionTuple;
+            return new Position() {X = x, Y = y, Z = z};
+        }
+        public static sbyte ReadAngle(this Stream stream) { throw new NotImplementedException(); }
+        public static Guid ReadUUID(this Stream stream) { throw new NotImplementedException(); }
         public static byte[] ReadBytes(this Stream stream, int amount)
         {
             var buffer = new byte[amount];

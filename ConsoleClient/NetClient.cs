@@ -208,7 +208,7 @@ namespace ConsoleClient
                         }
                     }
 
-                    ReceiveDataAsync(packetLength);
+                    ReceiveDataAsync2(packetLength);
                 }
             }
         }
@@ -254,6 +254,39 @@ namespace ConsoleClient
             }
             return null;
         }
+
+        public async Task<byte[]> ReceiveDataAsync2(int bufferSize)
+        {
+            byte[] buffer = new byte[bufferSize];
+            int totalBytesRead = 0;
+
+            while (totalBytesRead < bufferSize)
+            {
+                int bytesRead = await _networkStream.ReadAsync(buffer, totalBytesRead, bufferSize - totalBytesRead);
+
+                if (bytesRead <= 0)
+                {
+                    // Wenn keine Daten mehr gelesen werden können, breche ab.
+                    break;
+                }
+
+                totalBytesRead += bytesRead;
+            }
+
+            if (totalBytesRead > 0)
+            {
+                byte[] receivedData = new byte[totalBytesRead];
+                Array.Copy(buffer, receivedData, totalBytesRead);
+                InQueue.Enqueue(new PacketStream()
+                {
+                    Data = receivedData,
+                    PacketLength = totalBytesRead
+                });
+                return receivedData;
+            }
+            return null;
+        }
+
 
         private void Handshake(int protocolVersion, int nextStep = 1)
         {

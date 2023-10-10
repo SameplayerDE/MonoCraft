@@ -47,7 +47,7 @@ namespace ConsoleClient
 
             if (packetId == 0x0B)
             {
-                (int, int, int) position = packet.ReadPosition();
+                (int, int, int) position = packet.ReadPositionTuple();
                 int id = packet.ReadVarInt();
                 Console.WriteLine("BLOCK-CHANGE from server [{0}]", id);
 

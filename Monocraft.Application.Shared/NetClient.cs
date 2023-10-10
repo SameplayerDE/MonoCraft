@@ -99,7 +99,7 @@ namespace ConsoleClient
             _processThread.Start();
 
             Handshake(754, 2);
-            Login("Oktay");
+            Login(Console.ReadLine());
         }
 
         private void Process(object? obj)
@@ -212,7 +212,6 @@ namespace ConsoleClient
                             // packet is compressed
                         }
                     }
-
                     ReceiveDataAsync(packetLength);
                 }
             }
@@ -242,22 +241,47 @@ namespace ConsoleClient
             }
         }
 
+        public byte[] ReceiveData(int bufferSize)
+        {
+            byte[] buffer = new byte[bufferSize];
+            int totalBytesRead = 0;
+
+            while (totalBytesRead < bufferSize)
+            {
+                int bytesRead = _networkStream.Read(buffer, totalBytesRead, bufferSize - totalBytesRead);
+                if (bytesRead == 0)
+                {
+                    // Wenn Read() 0 Bytes zurückgibt, bedeutet dies, dass die Verbindung geschlossen wurde.
+                    throw new IOException("Verbindung geschlossen, bevor genügend Daten empfangen wurden.");
+                }
+                totalBytesRead += bytesRead;
+            }
+
+            return buffer;
+        }
+
+
         public async Task<byte[]> ReceiveDataAsync(int bufferSize)
         {
             byte[] buffer = new byte[bufferSize];
-            int bytesRead = await _networkStream.ReadAsync(buffer, 0, bufferSize);
-            if (bytesRead > 0)
+            int totalBytesRead = 0;
+
+            while (totalBytesRead < bufferSize)
             {
-                byte[] receivedData = new byte[bytesRead];
-                Array.Copy(buffer, receivedData, bytesRead);
-                InQueue.Enqueue(new PacketStream()
+                int bytesRead = await _networkStream.ReadAsync(buffer, totalBytesRead, bufferSize - totalBytesRead);
+                if (bytesRead == 0)
                 {
-                    Data = receivedData,
-                    PacketLength = bufferSize
-                });
-                return receivedData;
+                    // Wenn Read() 0 Bytes zurückgibt, bedeutet dies, dass die Verbindung geschlossen wurde.
+                    throw new IOException("Verbindung geschlossen, bevor genügend Daten empfangen wurden.");
+                }
+                totalBytesRead += bytesRead;
             }
-            return null;
+            InQueue.Enqueue(new PacketStream()
+            {
+                Data = buffer,
+                PacketLength = bufferSize
+            });
+            return buffer;
         }
 
         private void Handshake(int protocolVersion, int nextStep = 1)
