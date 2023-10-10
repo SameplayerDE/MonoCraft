@@ -1,4 +1,5 @@
-﻿using MonoCraft.Net.Predefined.Datatypes;
+﻿using fNbt;
+using MonoCraft.Net.Predefined.Datatypes;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -114,15 +115,42 @@ namespace MonoCraft.Net
         public static void WriteAngle(this Stream stream, sbyte value) { throw new NotImplementedException(); }
         public static void WriteUUID(this Stream stream, Guid value) { throw new NotImplementedException(); }
 
-        public static bool ReadBool(this Stream stream) { throw new NotImplementedException(); }
-        public static sbyte ReadSignedByte(this Stream stream) { throw new NotImplementedException(); }
+        public static bool ReadBool(this Stream stream)
+        {
+            var data = stream.ReadBytes(1);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(data);
+            }
+            return BitConverter.ToBoolean(data, 0);
+        }
+        public static sbyte ReadSignedByte(this Stream stream)
+        {
+            return (sbyte)stream.ReadByte();
+        }
         public static byte ReadUByte(this Stream stream)
         {
             return (byte)stream.ReadByte();
         }
-        public static short ReadShort(this Stream stream) { throw new NotImplementedException(); }
+        public static short ReadShort(this Stream stream)
+        {
+            var data = stream.ReadBytes(2);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(data);
+            }
+            return BitConverter.ToInt16(data, 0);
+        }
         public static ushort ReadUnsignedShort(this Stream stream) { throw new NotImplementedException(); }
-        public static int ReadInt(this Stream stream) { throw new NotImplementedException(); }
+        public static int ReadInt(this Stream stream)
+        {
+            var data = stream.ReadBytes(4);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(data);
+            }
+            return BitConverter.ToInt32(data, 0);
+        }
         public static float ReadFloat(this Stream stream)
         {
             var data = stream.ReadBytes(4);
@@ -184,7 +212,10 @@ namespace MonoCraft.Net
         public static long ReadVarLong(this Stream stream) { throw new NotImplementedException(); }
         public static long ReadEntityMetadata(this Stream stream) { throw new NotImplementedException(); }
         public static long ReadSlot(this Stream stream) { throw new NotImplementedException(); }
-        public static long ReadNBTag(this Stream stream) { throw new NotImplementedException(); }
+        public static NbtCompound ReadNBTag(this Stream stream)
+        {
+            return null;
+        }
         public static (int, int, int) ReadPositionTuple(this Stream stream)
         {
             byte[] data = stream.ReadBytes(8);
@@ -246,7 +277,10 @@ namespace MonoCraft.Net
             (int x, int y, int z) = positionTuple;
             return new Position() {X = x, Y = y, Z = z};
         }
-        public static sbyte ReadAngle(this Stream stream) { throw new NotImplementedException(); }
+        public static sbyte ReadAngle(this Stream stream)
+        {
+            return stream.ReadSignedByte();
+        }
         public static Guid ReadUUID(this Stream stream) { throw new NotImplementedException(); }
         public static byte[] ReadBytes(this Stream stream, int amount)
         {

@@ -4,7 +4,14 @@ using System.Data;
 using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
-using System.Xml.Linq;
+using System.Threading;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using MonoCraft.Net.Predefined.Enums;
 
 namespace ConsoleClient
 {
@@ -92,9 +99,8 @@ namespace ConsoleClient
             _processThread.IsBackground = true;
             _processThread.Start();
 
-            var name = Console.ReadLine();
-            Handshake(754, 2);
-            Login(name);
+            Handshake(MinecraftProtocolUtils.GetProtocolVersion(MinecraftVersion.Ver_1_16_4), 2);
+            Login("Nicolas");
         }
 
         private void Process(object? obj)
@@ -207,13 +213,12 @@ namespace ConsoleClient
                             // packet is compressed
                         }
                     }
-
-                    ReceiveDataAsync2(packetLength);
+                    ReceiveDataAsync(packetLength);
                 }
             }
         }
 
-        private void SetPosition(double x, double y, double z, float yaw, float pitch)
+        public void SetPosition(double x, double y, double z, float yaw, float pitch)
         {
             Player.X = x;
             Player.Y = y;
@@ -237,25 +242,27 @@ namespace ConsoleClient
             }
         }
 
-        public async Task<byte[]> ReceiveDataAsync(int bufferSize)
+        public byte[] ReceiveData(int bufferSize)
         {
             byte[] buffer = new byte[bufferSize];
-            int bytesRead = await _networkStream.ReadAsync(buffer, 0, bufferSize);
-            if (bytesRead > 0)
+            int totalBytesRead = 0;
+
+            while (totalBytesRead < bufferSize)
             {
-                byte[] receivedData = new byte[bytesRead];
-                Array.Copy(buffer, receivedData, bytesRead);
-                InQueue.Enqueue(new PacketStream()
+                int bytesRead = _networkStream.Read(buffer, totalBytesRead, bufferSize - totalBytesRead);
+                if (bytesRead == 0)
                 {
-                    Data = receivedData,
-                    PacketLength = bufferSize
-                });
-                return receivedData;
+                    // Wenn Read() 0 Bytes zurückgibt, bedeutet dies, dass die Verbindung geschlossen wurde.
+                    throw new IOException("Verbindung geschlossen, bevor genügend Daten empfangen wurden.");
+                }
+                totalBytesRead += bytesRead;
             }
-            return null;
+
+            return buffer;
         }
 
-        public async Task<byte[]> ReceiveDataAsync2(int bufferSize)
+
+        public async Task<byte[]> ReceiveDataAsync(int bufferSize)
         {
             byte[] buffer = new byte[bufferSize];
             int totalBytesRead = 0;
@@ -263,32 +270,22 @@ namespace ConsoleClient
             while (totalBytesRead < bufferSize)
             {
                 int bytesRead = await _networkStream.ReadAsync(buffer, totalBytesRead, bufferSize - totalBytesRead);
-
-                if (bytesRead <= 0)
+                if (bytesRead == 0)
                 {
-                    // Wenn keine Daten mehr gelesen werden können, breche ab.
-                    break;
+                    // Wenn Read() 0 Bytes zurückgibt, bedeutet dies, dass die Verbindung geschlossen wurde.
+                    throw new IOException("Verbindung geschlossen, bevor genügend Daten empfangen wurden.");
                 }
-
                 totalBytesRead += bytesRead;
             }
-
-            if (totalBytesRead > 0)
+            InQueue.Enqueue(new PacketStream()
             {
-                byte[] receivedData = new byte[totalBytesRead];
-                Array.Copy(buffer, receivedData, totalBytesRead);
-                InQueue.Enqueue(new PacketStream()
-                {
-                    Data = receivedData,
-                    PacketLength = totalBytesRead
-                });
-                return receivedData;
-            }
-            return null;
+                Data = buffer,
+                PacketLength = bufferSize
+            });
+            return buffer;
         }
 
-
-        private void Handshake(int protocolVersion, int nextStep = 1)
+        public void Handshake(int protocolVersion, int nextStep = 1)
         {
             var stream = new MemoryStream();
             stream.WriteVarInt(0x00);
@@ -299,7 +296,7 @@ namespace ConsoleClient
             OutQueue.Enqueue(stream.ToPacket());
         }
 
-        private void Login(string name = "Deus")
+        public void Login(string name = "Deus")
         {
             var stream = new MemoryStream();
             stream.WriteVarInt(0x00);
@@ -307,7 +304,7 @@ namespace ConsoleClient
             OutQueue.Enqueue(stream.ToPacket());
         }
 
-       public void KeepAlive(long id)
+        public void KeepAlive(long id)
         {
             var stream = new MemoryStream();
             stream.WriteVarInt(0x10);
@@ -315,7 +312,7 @@ namespace ConsoleClient
             OutQueue.Enqueue(stream.ToPacket());
         }
 
-        private void TeleportConfirm(int id)
+        public void TeleportConfirm(int id)
         {
             var stream = new MemoryStream();
             stream.WriteVarInt(0x00);

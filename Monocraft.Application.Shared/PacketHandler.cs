@@ -1,4 +1,6 @@
 ﻿using MonoCraft.Net;
+using MonoCraft.Net.Predefined;
+using MonoCraft.Net.Predefined.Clientbound.Play;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,6 +45,15 @@ namespace ConsoleClient
             {
                 string reason = packet.ReadString();
                 Console.WriteLine("disconnect from server [{0}]", reason);
+            }
+
+            if (packetId == 0x20)
+            {
+                ChunkDataPacket data = new ChunkDataPacket();
+                data.Encode(packet);
+
+                Console.WriteLine("{0}, {1}", data.ChunkX, data.ChunkY);
+
             }
 
             if (packetId == 0x0B)
