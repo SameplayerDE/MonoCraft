@@ -14,8 +14,24 @@ namespace MonoCraft.Net
         {
             stream.WriteByte(value);
         }
-        public static void WriteShort(this Stream stream, short value) { throw new NotImplementedException(); }
-        public static void WriteUnsignedShort(this Stream stream, ushort value) { throw new NotImplementedException(); }
+        public static void WriteShort(this Stream stream, short value)
+        {
+            var data = BitConverter.GetBytes(value);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(data);
+            }
+            stream.WriteBytes(data);
+        }
+        public static void WriteUnsignedShort(this Stream stream, ushort value)
+        {
+            var data = BitConverter.GetBytes(value);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(data);
+            }
+            stream.WriteBytes(data);
+        }
         public static void WriteInt(this Stream stream, int value)
         {
             var data = BitConverter.GetBytes(value);
@@ -233,5 +249,13 @@ namespace MonoCraft.Net
         }
         public static sbyte[] ReadSignedBytes(this Stream stream, int amount) { throw new NotImplementedException(); }
         public static void WriteSignedBytes(this Stream stream, sbyte[] value) { throw new NotImplementedException(); }
+        public static MemoryStream ToPacket(this MemoryStream stream)
+        {
+            byte[] content = stream.ToArray();
+            var packet = new MemoryStream();
+            packet.WriteVarInt(content.Length);
+            packet.Write(content, 0, content.Length);
+            return packet;
+        }
     }
 }
