@@ -34,6 +34,7 @@ namespace ConsoleClient
         private Thread _sendThread;
         private Thread _processThread;
 
+        public MinecraftVersion Version;
         private Socket _socket;
         private NetworkStream _networkStream;
 
@@ -60,6 +61,7 @@ namespace ConsoleClient
         {
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             OnConnectionEstablished += Init;
+            Version = MinecraftVersion.Ver_1_16_4;
         }
 
         public async Task ConnectAsync(string address, ushort port)

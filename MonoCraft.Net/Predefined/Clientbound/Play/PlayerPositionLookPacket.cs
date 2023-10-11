@@ -1,3 +1,5 @@
+using MonoCraft.Net.Predefined.Enums;
+
 namespace MonoCraft.Net.Predefined.Clientbound.Play;
 
 public class PlayerPositionLookPacket : Packet
@@ -11,11 +13,11 @@ public class PlayerPositionLookPacket : Packet
     public byte Flags;
     public int TeleportId;
     
-    public PlayerPositionLookPacket() : base(0x34)
+    public PlayerPositionLookPacket() : base()
     {
     }
 
-    public override void Decode(Stream stream)
+    public override void Decode(Stream stream, MinecraftVersion version)
     {
         X = stream.ReadDouble();
         Y = stream.ReadDouble();
@@ -26,7 +28,7 @@ public class PlayerPositionLookPacket : Packet
         TeleportId = stream.ReadVarInt();
     }
 
-    public override void Encode(Stream stream)
+    public override void Encode(Stream stream, MinecraftVersion version)
     {
         throw new NotImplementedException();
     }

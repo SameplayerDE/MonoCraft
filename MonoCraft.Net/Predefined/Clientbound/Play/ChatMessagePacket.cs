@@ -1,3 +1,5 @@
+using MonoCraft.Net.Predefined.Enums;
+
 namespace MonoCraft.Net.Predefined.Clientbound.Play;
 
 public class ChatMessagePacket : Packet
@@ -7,18 +9,18 @@ public class ChatMessagePacket : Packet
     public byte Position;
     public Guid Sender;
     
-    public ChatMessagePacket() : base(0x0E)
+    public ChatMessagePacket() : base()
     {
     }
 
-    public override void Decode(Stream stream)
+    public override void Decode(Stream stream, MinecraftVersion version)
     {
         JsonData = stream.ReadChat();
         Position = stream.ReadUByte();
         Sender = stream.ReadUUID();
     }
 
-    public override void Encode(Stream stream)
+    public override void Encode(Stream stream, MinecraftVersion version)
     {
         throw new NotImplementedException();
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MonoCraft.Net.Predefined.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,16 +9,16 @@ namespace MonoCraft.Net.Predefined.Clientbound.Play
 {
     public class SpawnPaintingPacket : Packet
     {
-        public SpawnPaintingPacket() : base(0x03)
+        public SpawnPaintingPacket() : base()
         {
         }
 
-        public override void Decode(Stream stream)
+        public override void Decode(Stream stream, MinecraftVersion version)
         {
             throw new NotImplementedException();
         }
 
-        public override void Encode(Stream stream)
+        public override void Encode(Stream stream, MinecraftVersion version)
         {
             throw new NotImplementedException();
         }

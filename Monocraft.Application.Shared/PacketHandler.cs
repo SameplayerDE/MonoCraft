@@ -50,7 +50,7 @@ namespace ConsoleClient
             if (packetId == 0x20)
             {
                 ChunkDataPacket data = new ChunkDataPacket();
-                data.Encode(packet);
+                data.Encode(packet, TODO);
 
                 Console.WriteLine("{0}, {1}", data.ChunkX, data.ChunkY);
 

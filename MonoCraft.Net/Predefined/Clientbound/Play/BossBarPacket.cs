@@ -8,17 +8,17 @@ public class BossBarPacket : Packet
     public Guid UUID;
     public int Action;
     
-    public BossBarPacket() : base(0x0C)
+    public BossBarPacket() : base()
     {
     }
 
-    public override void Decode(Stream stream)
+    public override void Decode(Stream stream, MinecraftVersion version)
     {
         UUID = stream.ReadUUID();
         Action = stream.ReadVarInt();
     }
 
-    public override void Encode(Stream stream)
+    public override void Encode(Stream stream, MinecraftVersion version)
     {
         throw new NotImplementedException();
     }

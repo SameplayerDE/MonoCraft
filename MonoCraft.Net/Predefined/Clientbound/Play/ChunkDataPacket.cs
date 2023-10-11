@@ -1,4 +1,5 @@
 ﻿using fNbt;
+using MonoCraft.Net.Predefined.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +20,11 @@ namespace MonoCraft.Net.Predefined.Clientbound.Play
         public byte[] Data;
         public List<NbtCompound> TileEntities;
 
-        public ChunkDataPacket() : base(0x20)
+        public ChunkDataPacket() : base()
         {
         }
 
-        public override void Decode(Stream stream)
+        public override void Decode(Stream stream, MinecraftVersion version)
         {
             ChunkX = stream.ReadInt();
             ChunkY = stream.ReadInt();
@@ -55,7 +56,7 @@ namespace MonoCraft.Net.Predefined.Clientbound.Play
            //}
         }
 
-        public override void Encode(Stream stream)
+        public override void Encode(Stream stream, MinecraftVersion version)
         {
             throw new NotImplementedException();
         }

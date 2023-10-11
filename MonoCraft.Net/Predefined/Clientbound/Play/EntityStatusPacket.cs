@@ -1,3 +1,5 @@
+using MonoCraft.Net.Predefined.Enums;
+
 namespace MonoCraft.Net.Predefined.Clientbound.Play;
 
 public class EntityStatusPacket : Packet
@@ -6,17 +8,17 @@ public class EntityStatusPacket : Packet
     public int EntityId;
     public byte EntityStatus;
     
-    public EntityStatusPacket() : base(0x1A)
+    public EntityStatusPacket() : base()
     {
     }
 
-    public override void Decode(Stream stream)
+    public override void Decode(Stream stream, MinecraftVersion version)
     {
         EntityId = stream.ReadInt();
         EntityStatus = stream.ReadUByte();
     }
 
-    public override void Encode(Stream stream)
+    public override void Encode(Stream stream, MinecraftVersion version)
     {
         throw new NotImplementedException();
     }

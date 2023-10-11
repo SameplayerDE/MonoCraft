@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MonoCraft.Net.Predefined.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,11 +16,11 @@ namespace MonoCraft.Net.Predefined.Clientbound.Play
         public short DeltaZ;
         public bool OnGround;
 
-        public EntityPositionPacket() : base(0x27)
+        public EntityPositionPacket() : base()
         {
         }
 
-        public override void Decode(Stream stream)
+        public override void Decode(Stream stream, MinecraftVersion version)
         {
             EntityId = stream.ReadVarInt();
             DeltaX = stream.ReadShort();
@@ -28,7 +29,7 @@ namespace MonoCraft.Net.Predefined.Clientbound.Play
             OnGround = stream.ReadBool();
         }
 
-        public override void Encode(Stream stream)
+        public override void Encode(Stream stream, MinecraftVersion version)
         {
             throw new NotImplementedException();
         }

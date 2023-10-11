@@ -1,15 +1,13 @@
+using MonoCraft.Net.Predefined.Enums;
+
 namespace MonoCraft.Net;
 
 public abstract class Packet : IPacket
 {
-
-    public int Identifier;
-
-    public Packet(int identifier)
+    public Packet()
     {
-        Identifier = identifier;
     }
 
-    public abstract void Decode(Stream stream);
-    public abstract void Encode(Stream stream);
+    public abstract void Decode(Stream stream, MinecraftVersion version);
+    public abstract void Encode(Stream stream, MinecraftVersion version);
 }

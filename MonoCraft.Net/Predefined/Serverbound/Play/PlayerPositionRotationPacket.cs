@@ -1,3 +1,5 @@
+using MonoCraft.Net.Predefined.Enums;
+
 namespace MonoCraft.Net.Predefined.Serverbound.Play;
 
 public class PlayerPositionRotationPacket : Packet
@@ -10,16 +12,16 @@ public class PlayerPositionRotationPacket : Packet
     public float Pitch;
     public bool OnGround;
     
-    public PlayerPositionRotationPacket() : base(0x13)
+    public PlayerPositionRotationPacket() : base()
     {
     }
 
-    public override void Decode(Stream stream)
+    public override void Decode(Stream stream, MinecraftVersion version)
     {
         throw new NotImplementedException();
     }
 
-    public override void Encode(Stream stream)
+    public override void Encode(Stream stream, MinecraftVersion version)
     {
         stream.WriteDouble(X);
         stream.WriteDouble(FeetY);

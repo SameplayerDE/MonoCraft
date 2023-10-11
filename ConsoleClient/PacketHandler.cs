@@ -1,5 +1,6 @@
 ﻿using MonoCraft.Net;
 using MonoCraft.Net.Predefined.Clientbound.Play;
+using MonoCraft.Net.Predefined.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,48 +15,58 @@ namespace ConsoleClient
         public static void HandlePacket(MemoryStream packet, NetClient client)
         {
             int packetId = packet.ReadVarInt();
-            //Console.WriteLine("packet from server [{0:x2}]", packetId);
+
+            if (Enum.IsDefined(typeof(ClientboundPlayPacketType), packetId))
+            {
+                ClientboundPlayPacketType enumValue = (ClientboundPlayPacketType)packetId;
+                string stringValue = enumValue.ToString();
+                Console.WriteLine(stringValue);
+            }
+            else
+            {
+                Console.WriteLine("Invalid int value; cannot cast to the enum.");
+            }
 
             if (packetId == 0x03)
             {
                 int threshold = packet.ReadVarInt();
                 client.CompressionThreshold = threshold;
-                Console.WriteLine("set-compression from server [{0}]", threshold);
+                //Console.WriteLine("set-compression from server [{0}]", threshold);
             }
 
             if (packetId == 0x27)
             {
                 EntityPositionPacket data = new EntityPositionPacket();
-                data.Decode(packet);
+                data.Decode(packet, client.Version);
 
-                Console.WriteLine("entity-postion from server");
+                //Console.WriteLine("entity-postion from server");
 
             }
 
             if (packetId == 0x28)
             {
                 EntityPositionRotationPacket data = new EntityPositionRotationPacket();
-                data.Decode(packet);
+                data.Decode(packet, client.Version);
 
-                Console.WriteLine("entity-postion-rotation from server");
+                //Console.WriteLine("entity-postion-rotation from server");
 
             }
 
             if (packetId == 0x29)
             {
                 EntityRotationPacket data = new EntityRotationPacket();
-                data.Decode(packet);
+                data.Decode(packet, client.Version);
 
-                Console.WriteLine("entity-rotation from server [{0},{1}]", data.Yaw, data.Pitch);
+                //Console.WriteLine("entity-rotation from server [{0},{1}]", data.Yaw, data.Pitch);
 
             }
 
             if (packetId == 0x20)
             {
                 ChunkDataPacket data = new ChunkDataPacket();
-                data.Decode(packet);
+                data.Decode(packet, client.Version);
 
-                Console.WriteLine("chunk-data from server [{0}, {1}]", data.ChunkX, data.ChunkY);
+                //Console.WriteLine("chunk-data from server [{0}, {1}]", data.ChunkX, data.ChunkY);
 
                 var chunkDataStream = new MemoryStream(data.Data);
                 chunkDataStream.Dispose();
@@ -86,21 +97,21 @@ namespace ConsoleClient
             if (packetId == 0x1F)
             {
                 long keepAliveId = packet.ReadLong();
-                Console.WriteLine("keep-alive from server [{0}]", keepAliveId);
+                //Console.WriteLine("keep-alive from server [{0}]", keepAliveId);
                 client.KeepAlive(keepAliveId);
             }
 
             if (packetId == 0x19)
             {
                 string reason = packet.ReadString();
-                Console.WriteLine("disconnect from server [{0}]", reason);
+                //Console.WriteLine("disconnect from server [{0}]", reason);
             }
 
             if (packetId == 0x0B)
             {
                 (int, int, int) position = packet.ReadPositionTuple();
                 int id = packet.ReadVarInt();
-                Console.WriteLine("BLOCK-CHANGE from server [{0}]", id);
+                //Console.WriteLine("BLOCK-CHANGE from server [{0}]", id);
             }
 
             if (packetId == 0x0E)
@@ -137,7 +148,7 @@ namespace ConsoleClient
             {
                 long worldAge = packet.ReadLong();
                 long timeOfDay = packet.ReadLong();
-                Console.WriteLine("time-update from server [{0}, {1}]", worldAge, timeOfDay);
+                //Console.WriteLine("time-update from server [{0}, {1}]", worldAge, timeOfDay);
 
                 //SendPosition(Player);
                 //OnServerTick?.Invoke();

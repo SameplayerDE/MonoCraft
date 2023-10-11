@@ -10,7 +10,7 @@ namespace MonoCraft.Net.Predefined
     {
         public long KeepAliveId;
 
-        public KeepAliveBase(int identifier) : base(identifier)
+        public KeepAliveBase(int identifier) : base()
         {
         }
     }

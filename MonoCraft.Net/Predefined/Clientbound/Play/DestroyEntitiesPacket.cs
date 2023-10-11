@@ -1,3 +1,5 @@
+using MonoCraft.Net.Predefined.Enums;
+
 namespace MonoCraft.Net.Predefined.Clientbound.Play;
 
 public class DestroyEntitiesPacket : Packet
@@ -6,11 +8,11 @@ public class DestroyEntitiesPacket : Packet
     public int Count;
     public int[] EntityIds;
     
-    public DestroyEntitiesPacket() : base(0x36)
+    public DestroyEntitiesPacket() : base()
     {
     }
 
-    public override void Decode(Stream stream)
+    public override void Decode(Stream stream, MinecraftVersion version)
     {
         Count = stream.ReadVarInt();
         EntityIds = new int[Count];
@@ -20,7 +22,7 @@ public class DestroyEntitiesPacket : Packet
         }
     }
 
-    public override void Encode(Stream stream)
+    public override void Encode(Stream stream, MinecraftVersion version)
     {
         throw new NotImplementedException();
     }

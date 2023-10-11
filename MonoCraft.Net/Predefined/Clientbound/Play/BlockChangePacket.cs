@@ -1,4 +1,5 @@
 ﻿using MonoCraft.Net.Predefined.Datatypes;
+using MonoCraft.Net.Predefined.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,17 +13,17 @@ namespace MonoCraft.Net.Predefined.Clientbound.Play
         public Position Location;
         public int BlockId;
 
-        public BlockChangePacket() : base(0x0B)
+        public BlockChangePacket() : base()
         {
         }
 
-        public override void Decode(Stream stream)
+        public override void Decode(Stream stream, MinecraftVersion version)
         {
             Location = stream.ReadPosition();
             BlockId = stream.ReadVarInt();
         }
 
-        public override void Encode(Stream stream)
+        public override void Encode(Stream stream, MinecraftVersion version)
         {
             throw new NotImplementedException();
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MonoCraft.Net.Predefined.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace MonoCraft.Net
 {
     public interface IPacket
     {
-        void Encode(Stream stream);
-        void Decode(Stream stream);
+        void Encode(Stream stream, MinecraftVersion version);
+        void Decode(Stream stream, MinecraftVersion version);
     }
 }
