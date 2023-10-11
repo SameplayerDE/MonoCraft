@@ -9,9 +9,7 @@
   <ItemGroup>
     <Folder Include="Predefined\Clientbound\Login\" />
     <Folder Include="Predefined\Clientbound\Handshake\" />
-    <Folder Include="Predefined\Clientbound\Status\" />
     <Folder Include="Predefined\Serverbound\Login\" />
-    <Folder Include="Predefined\Serverbound\Status\" />
   </ItemGroup>
 
   <ItemGroup>
