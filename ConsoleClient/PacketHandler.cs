@@ -12,10 +12,14 @@ namespace ConsoleClient
     internal static class PacketHandler
     {
 
+        private static PacketIdentifier Identifier = PacketIdentifier.Instance;
+        
         public static void HandlePacket(MemoryStream packet, NetClient client)
         {
             int packetId = packet.ReadVarInt();
 
+            Console.WriteLine(Identifier.Identify(client.Version, client.ConnectionState, packetId));
+            
             if (Enum.IsDefined(typeof(ClientboundPlayPacketType), packetId))
             {
                 ClientboundPlayPacketType enumValue = (ClientboundPlayPacketType)packetId;

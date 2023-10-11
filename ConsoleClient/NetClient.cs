@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using MonoCraft.Net.Predefined.Enums;
+using ConnectionState = MonoCraft.Net.Predefined.Enums.ConnectionState;
 
 namespace ConsoleClient
 {
@@ -35,6 +36,7 @@ namespace ConsoleClient
         private Thread _processThread;
 
         public MinecraftVersion Version;
+        public ConnectionState ConnectionState;
         private Socket _socket;
         private NetworkStream _networkStream;
 
@@ -57,11 +59,11 @@ namespace ConsoleClient
         private Semaphore _packetsToProcess = new Semaphore(0, 1);
         public object penis;
 
-        public NetClient()
+        public NetClient(MinecraftVersion version)
         {
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             OnConnectionEstablished += Init;
-            Version = MinecraftVersion.Ver_1_16_4;
+            Version = version;
         }
 
         public async Task ConnectAsync(string address, ushort port)
@@ -101,8 +103,8 @@ namespace ConsoleClient
             _processThread.IsBackground = true;
             _processThread.Start();
 
-            Handshake(MinecraftProtocolUtils.GetProtocolVersion(MinecraftVersion.Ver_1_16_4), 2);
-            Login("Nicolas");
+            Handshake((int)Version, 2);
+            Login("Nigger");
         }
 
         private void Process(object? obj)
@@ -289,6 +291,7 @@ namespace ConsoleClient
 
         public void Handshake(int protocolVersion, int nextStep = 1)
         {
+            ConnectionState = ConnectionState.Handshake;
             var stream = new MemoryStream();
             stream.WriteVarInt(0x00);
             stream.WriteVarInt(protocolVersion);
@@ -296,6 +299,7 @@ namespace ConsoleClient
             stream.WriteUnsignedShort(_port);
             stream.WriteVarInt(nextStep);
             OutQueue.Enqueue(stream.ToPacket());
+            ConnectionState = ConnectionState.Login;
         }
 
         public void Login(string name = "Deus")
