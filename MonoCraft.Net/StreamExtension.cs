@@ -268,7 +268,7 @@ namespace MonoCraft.Net
                 o_z = Convert.ToInt32(z);
             }
 
-            Console.WriteLine($"x: {o_x}/ y: {o_z} / z: {o_y}");
+            //Console.WriteLine($"x: {o_x}/ y: {o_z} / z: {o_y}");
             return (o_x, o_z, o_y);
         }
         public static Position ReadPosition(this Stream stream)

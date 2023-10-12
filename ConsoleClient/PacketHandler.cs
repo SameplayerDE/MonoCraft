@@ -14,21 +14,22 @@ namespace ConsoleClient
 
         private static PacketIdentifier Identifier = PacketIdentifier.Instance;
         
-        public static void HandlePacket(MemoryStream packet, NetClient client)
+        public static async void HandlePacket(MemoryStream packet, NetClient client)
         {
             int packetId = packet.ReadVarInt();
 
-            Console.WriteLine(Identifier.Identify(client.Version, client.ConnectionState, packetId));
+            var packetType = Identifier.Identify(client.Version, PacketDirection.Clientbound, client.ConnectionState, packetId);
             
-            if (Enum.IsDefined(typeof(ClientboundPlayPacketType), packetId))
+            if (packetType != MinecraftPacketType.NotImplemented)
             {
-                ClientboundPlayPacketType enumValue = (ClientboundPlayPacketType)packetId;
-                string stringValue = enumValue.ToString();
-                Console.WriteLine(stringValue);
+                Console.WriteLine(packetType.ToString());
             }
-            else
+
+            await Task.Delay(10);
+
+            if (packetType == MinecraftPacketType.CB_Login_LoginSuccess)
             {
-                Console.WriteLine("Invalid int value; cannot cast to the enum.");
+                client.ConnectionState = ConnectionState.Play;
             }
 
             if (packetId == 0x03)

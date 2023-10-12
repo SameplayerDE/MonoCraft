@@ -2,11 +2,11 @@
 using System;
 using MonoCraft.Net.Predefined.Enums;
 
-NetClient client = new NetClient(MinecraftVersion.Ver_1_20_1);
+NetClient client = new NetClient(MinecraftVersion.Ver_1_16_4);
 client.OnConnectionEstablished += Init;
 //client.OnServerTick += () => client.Chat("Tick");
 
-await client.ConnectAsync("forgeunited.org", 25565);
+await client.ConnectAsync("localhost", 25565);
 
 Player Player = client.Player;
 Random random = new Random();

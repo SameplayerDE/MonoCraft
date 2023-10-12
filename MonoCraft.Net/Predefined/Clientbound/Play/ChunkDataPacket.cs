@@ -30,7 +30,6 @@ namespace MonoCraft.Net.Predefined.Clientbound.Play
             ChunkY = stream.ReadInt();
             FullChunk = stream.ReadBool();
             PrimaryBitMask = stream.ReadVarInt();
-
             HeightMaps = stream.ReadNBTag();
 
             if (FullChunk)

@@ -104,7 +104,7 @@ namespace ConsoleClient
             _processThread.Start();
 
             Handshake((int)Version, 2);
-            Login("Nigger");
+            Login("Nicolas");
         }
 
         private void Process(object? obj)
