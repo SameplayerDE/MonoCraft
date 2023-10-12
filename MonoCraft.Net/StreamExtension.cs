@@ -188,7 +188,16 @@ namespace MonoCraft.Net
             }
             return Encoding.Default.GetString(chars);
         }
-        public static string ReadChat(this Stream stream) { throw new NotImplementedException(); }
+        public static string ReadChat(this Stream stream)
+        {
+            int length = stream.ReadVarInt();
+            byte[] chars = new byte[length];
+            for (int i = 0; i < length; i++)
+            {
+                chars[i] = stream.ReadUByte();
+            }
+            return Encoding.UTF8.GetString(chars);
+        }
         public static string ReadIdentifier(this Stream stream) { throw new NotImplementedException(); }
         public static int ReadVarInt(this Stream stream) 
         {

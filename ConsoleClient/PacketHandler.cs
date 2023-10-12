@@ -1,5 +1,6 @@
 ﻿using MonoCraft.Net;
-using MonoCraft.Net.Predefined.Clientbound.Play;
+using Login = MonoCraft.Net.Predefined.Clientbound.Login;
+using Play = MonoCraft.Net.Predefined.Clientbound.Play;
 using MonoCraft.Net.Predefined.Enums;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,36 @@ namespace ConsoleClient
                 Console.WriteLine(packetType.ToString());
             }
 
-            await Task.Delay(10);
+            if (packetType == MinecraftPacketType.CB_Login_EncryptionRequest)
+            {
+                Login.EncryptionRequestPacket data = new Login.EncryptionRequestPacket();
+                data.Decode(packet, client.Version);
+
+                Console.WriteLine(data.ServerId);
+                Console.WriteLine(BitConverter.ToString(data.PublicKey));
+                Console.WriteLine(BitConverter.ToString(data.VerifyToken));
+            }
+            if (packetType == MinecraftPacketType.CB_Login_SetCompression)
+            {
+                Login.SetCompressionPacket data = new Login.SetCompressionPacket();
+                data.Decode(packet, client.Version);
+
+                Console.WriteLine("threshold: {0}", data.Threshold);
+            }
+            if (packetType == MinecraftPacketType.CB_Login_Disconnect)
+            {
+                Login.DisconnectPacket data = new Login.DisconnectPacket();
+                data.Decode(packet, client.Version);
+
+                Console.WriteLine("reason: {0}", data.Reason);
+            }
+            if (packetType == MinecraftPacketType.CB_Login_SetCompression)
+            {
+                Login.SetCompressionPacket data = new Login.SetCompressionPacket();
+                data.Decode(packet, client.Version);
+
+                Console.WriteLine("threshold: {0}", data.Threshold);
+            }
 
             if (packetType == MinecraftPacketType.CB_Login_LoginSuccess)
             {
@@ -41,7 +71,7 @@ namespace ConsoleClient
 
             if (packetId == 0x27)
             {
-                EntityPositionPacket data = new EntityPositionPacket();
+                Play.EntityPositionPacket data = new Play.EntityPositionPacket();
                 data.Decode(packet, client.Version);
 
                 //Console.WriteLine("entity-postion from server");
@@ -50,7 +80,7 @@ namespace ConsoleClient
 
             if (packetId == 0x28)
             {
-                EntityPositionRotationPacket data = new EntityPositionRotationPacket();
+                Play.EntityPositionRotationPacket data = new Play.EntityPositionRotationPacket();
                 data.Decode(packet, client.Version);
 
                 //Console.WriteLine("entity-postion-rotation from server");
@@ -59,7 +89,7 @@ namespace ConsoleClient
 
             if (packetId == 0x29)
             {
-                EntityRotationPacket data = new EntityRotationPacket();
+                Play.EntityRotationPacket data = new Play.EntityRotationPacket();
                 data.Decode(packet, client.Version);
 
                 //Console.WriteLine("entity-rotation from server [{0},{1}]", data.Yaw, data.Pitch);
@@ -68,7 +98,7 @@ namespace ConsoleClient
 
             if (packetId == 0x20)
             {
-                ChunkDataPacket data = new ChunkDataPacket();
+                Play.ChunkDataPacket data = new Play.ChunkDataPacket();
                 data.Decode(packet, client.Version);
 
                 //Console.WriteLine("chunk-data from server [{0}, {1}]", data.ChunkX, data.ChunkY);

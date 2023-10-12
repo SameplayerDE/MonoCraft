@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Predefined\Clientbound\Login\" />
     <Folder Include="Predefined\Clientbound\Handshake\" />
     <Folder Include="Predefined\Serverbound\Login\" />
   </ItemGroup>
