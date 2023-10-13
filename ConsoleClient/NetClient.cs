@@ -138,7 +138,7 @@ namespace ConsoleClient
             }
         }
 
-        private void Send(object? obj)
+        private async void Send(object? obj)
         {
             Console.WriteLine("Called Send");
             while (IsConnected)
@@ -154,7 +154,7 @@ namespace ConsoleClient
                                 // packet needs to be compressed
                             }
                         }
-                        SendDataAsync(packet);
+                        await SendDataAsync(packet);
                         //packet.Dispose();
                     }
                 }
