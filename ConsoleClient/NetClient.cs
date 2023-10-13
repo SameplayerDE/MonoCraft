@@ -66,6 +66,7 @@ namespace ConsoleClient
             Version = version;
         }
 
+
         public async Task ConnectAsync(string address, ushort port)
         {
             _address = address;

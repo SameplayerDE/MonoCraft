@@ -14,16 +14,19 @@ namespace ConsoleClient
     public class PerfClient
     {
 
-        private TcpClient _client;
+        private Socket _socket;
+        private NetworkStream _networkStream;
         private Thread _readThread;
+
         private string _address;
         private ushort _port;
 
-        public bool IsConnected => _client.Connected;
+        public bool IsConnected => _socket.Connected;
+        public int Available => _socket.Available;
 
         public PerfClient()
         {
-            _client = new TcpClient();
+            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
         public void Connect(string address, ushort port)
@@ -32,11 +35,11 @@ namespace ConsoleClient
             _port = port;
             try
             {
-                _client.Connect(address, port);
+                _socket.Connect(address, port);
 
-                if (_client.Connected)
+                if (IsConnected)
                 {
-
+                    _networkStream = new NetworkStream(_socket, true);
                     Handshake((int)MinecraftVersion.Ver_1_16_4, 2);
                     Login("Oktay");
 
@@ -54,23 +57,34 @@ namespace ConsoleClient
 
         private async void Read(object? obj)
         {
-            while (_client.Connected)
+            while (IsConnected)
             {
-                if (_client.Available > 10)
+                if (Available > 10)
                 {
-                    int available = _client.Available;
-                    byte[] buffer = new byte[available];
-                    _client.GetStream().Read(buffer, 0, available);
-                    foreach (byte b in buffer)
-                    {
-                        Console.WriteLine($"{Convert.ToString(b, 2)}");
-                    }
+                    PacketHandler.HandlePacket(new MemoryStream(ReceiveData(_networkStream.ReadVarInt())));
                 }
                 else
                 {
                     await Task.Delay(1);
                 }
             }
+        }
+
+        public byte[] ReceiveData(int bufferSize)
+        {
+            byte[] buffer = new byte[bufferSize];
+            int totalBytesRead = 0;
+
+            while (totalBytesRead < bufferSize)
+            {
+                int bytesRead = _networkStream.Read(buffer, totalBytesRead, bufferSize - totalBytesRead);
+                if (bytesRead == 0)
+                {
+                    throw new IOException("Verbindung geschlossen, bevor genügend Daten empfangen wurden.");
+                }
+                totalBytesRead += bytesRead;
+            }
+            return buffer;
         }
 
         public void Handshake(int protocolVersion, int nextStep = 1)
@@ -81,7 +95,7 @@ namespace ConsoleClient
             stream.WriteString(_address);
             stream.WriteUnsignedShort(_port);
             stream.WriteVarInt(nextStep);
-            _client.GetStream().Write(stream.ToPacket().ToArray());
+            _networkStream.Write(stream.ToPacket().ToArray());
         }
 
         public void Login(string name = "Deus")
@@ -89,7 +103,7 @@ namespace ConsoleClient
             var stream = new MemoryStream();
             stream.WriteVarInt(0x00);
             stream.WriteString(name);
-            _client.GetStream().Write(stream.ToPacket().ToArray());
+            _networkStream.Write(stream.ToPacket().ToArray());
         }
 
     }

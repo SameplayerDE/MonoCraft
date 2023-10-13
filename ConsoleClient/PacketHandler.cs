@@ -192,5 +192,14 @@ namespace ConsoleClient
             packet.Dispose();
         }
 
+        public static void HandlePacket(MemoryStream packet)
+        {
+            int packetId = packet.ReadVarInt();
+
+            Console.WriteLine("{0:x2}", packetId);
+
+            packet.Dispose();
+        }
+
     }
 }
