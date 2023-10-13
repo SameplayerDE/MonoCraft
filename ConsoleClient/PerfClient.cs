@@ -98,33 +98,36 @@ namespace ConsoleClient
 
         private Task ProcessPacket(MemoryStream stream)
         {
-            int packetId = stream.ReadVarInt();
 
-            var packetType = PacketIdentifier.Instance.Identify(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState, packetId);
+            PacketHandler.HandlePacket(stream, MinecraftVersion.Ver_1_16_4, ConnectionState);
 
-            if (packetType != MinecraftPacketType.NotImplemented)
-            {
-                try
-                {
-                    var type = PacketIdentifier.Instance.GetTypeByType(packetType);
-                   
-                    if (type != null)
-                    {
-                        var packet = (Packet)Activator.CreateInstance(type);
-                        try
-                        {
-                            packet?.Decode(stream, MinecraftVersion.Ver_1_16_4);
-                        }catch(Exception e)
-                        {
-                            Console.WriteLine(e.ToString());
-                        }
-                    }
-                }catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
-            }
-
+            //int packetId = stream.ReadVarInt();
+            //
+            //var packetType = PacketIdentifier.Instance.Identify(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState, packetId);
+            //
+            //if (packetType != MinecraftPacketType.NotImplemented)
+            //{
+            //    //try
+            //    //{
+            //    //    var type = PacketIdentifier.Instance.GetTypeByType(packetType);
+            //    //   
+            //    //    if (type != null)
+            //    //    {
+            //    //        var packet = (Packet)Activator.CreateInstance(type);
+            //    //        try
+            //    //        {
+            //    //            packet?.Decode(stream, MinecraftVersion.Ver_1_16_4);
+            //    //        }catch(Exception e)
+            //    //        {
+            //    //            Console.WriteLine(e.ToString());
+            //    //        }
+            //    //    }
+            //    //}catch (Exception ex)
+            //    //{
+            //    //    Console.WriteLine(ex.ToString());
+            //    //}
+            //}
+            //
 
 
 
@@ -146,7 +149,6 @@ namespace ConsoleClient
             //}
 
             stream.Dispose();
-
             return Task.CompletedTask;
         }
 

@@ -139,7 +139,7 @@ namespace ConsoleClient
                             {
                                 continue;
                             }
-                            PacketHandler.HandlePacket(packet, this);
+                            //PacketHandler.HandlePacket(packet, this);
                         }
                     }
                     catch (Exception e)
