@@ -7,7 +7,7 @@ client.Connect("localhost", 25565);
 
 while (client.IsConnected)
 {
-
+    
 }
 
 //NetClient client = new NetClient(MinecraftVersion.Ver_1_16_4);

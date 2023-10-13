@@ -20,7 +20,11 @@ namespace MonoCraft.Net.Predefined.Serverbound.Play
 
         public override void Encode(Stream stream, MinecraftVersion version)
         {
-            throw new NotImplementedException();
+            if (version == MinecraftVersion.Ver_1_16_4)
+            {
+                stream.WriteVarInt(PacketIdentifier.Instance.Identify(version, MinecraftPacketType.SB_Play_KeepAlive));
+                stream.WriteLong(KeepAliveId);
+            }
         }
     }
 }

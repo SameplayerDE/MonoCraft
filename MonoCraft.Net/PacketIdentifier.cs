@@ -7,6 +7,7 @@ public class PacketIdentifier
     public static PacketIdentifier Instance { get; } = new();
 
     private Dictionary<(MinecraftVersion, PacketDirection, ConnectionState, int), MinecraftPacketType> _map = new();
+    private Dictionary<MinecraftPacketType, Type> _typeMap = new();
     
     static PacketIdentifier()
     {
@@ -15,6 +16,10 @@ public class PacketIdentifier
 
     private PacketIdentifier()
     {
+
+        _typeMap[MinecraftPacketType.CB_Play_KeepAlive] = typeof(MonoCraft.Net.Predefined.Clientbound.Play.KeepAlivePacket);
+
+
         Map1164Clientbound();
         Map1164Serverbound();
     }
@@ -33,7 +38,28 @@ public class PacketIdentifier
         return MinecraftPacketType.NotImplemented;
         throw new Exception("packet with this id does not exist for this minecraft version");
     }
-    
+
+    public Type GetTypeByType(MinecraftPacketType type)
+    {
+        if (_typeMap.TryGetValue(type, out var result))
+        {
+            return result;
+        }
+        return null;
+    }
+
+    public int Identify(MinecraftVersion version, MinecraftPacketType packetType)
+    {
+        foreach ((var key, var value) in _map)
+        {
+            if (key.Item1 == version && value == packetType)
+            {
+                return key.Item4;
+            }
+        }
+        return -1;
+    }
+
     private void Map1164Clientbound()
     {
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Login, 0x00, MinecraftPacketType.CB_Login_Disconnect);
@@ -143,6 +169,6 @@ public class PacketIdentifier
 
     private void Map1164Serverbound()
     {
-
+        Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Serverbound, ConnectionState.Play, 0x10, MinecraftPacketType.SB_Play_KeepAlive);
     }
 }

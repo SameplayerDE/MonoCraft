@@ -113,4 +113,5 @@ public enum MinecraftPacketType
     CB_Play_DeclareRecipes,
     CB_Play_Tags,
     SB_Play_,
+    SB_Play_KeepAlive,
 }

@@ -1,5 +1,7 @@
 ﻿using MonoCraft.Net;
 using MonoCraft.Net.Predefined.Enums;
+using Clientbound = MonoCraft.Net.Predefined.Clientbound;
+using Serverbound = MonoCraft.Net.Predefined.Serverbound;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +10,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security.Cryptography.X509Certificates;
+using System.Runtime.CompilerServices;
 
 namespace ConsoleClient
 {
@@ -23,10 +27,12 @@ namespace ConsoleClient
 
         public bool IsConnected => _socket.Connected;
         public int Available => _socket.Available;
+        public ConnectionState ConnectionState;
 
         public PerfClient()
         {
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            ConnectionState = ConnectionState.Handshake;
         }
 
         public void Connect(string address, ushort port)
@@ -57,17 +63,93 @@ namespace ConsoleClient
 
         private async void Read(object? obj)
         {
-            while (IsConnected)
+            try
             {
-                if (Available > 10)
+                while (IsConnected)
                 {
-                    PacketHandler.HandlePacket(new MemoryStream(ReceiveData(_networkStream.ReadVarInt())));
-                }
-                else
-                {
-                    await Task.Delay(1);
+
+                    if (_networkStream == null)
+                    {
+                        break;
+                    }
+
+                    if (Available > 10)
+                    {
+                        try
+                        {
+                            await ProcessPacket(new MemoryStream(ReceiveData(_networkStream.ReadVarInt())));
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"{ex.Message}");
+                        }
+                    }
+                    else
+                    {
+                        await Task.Delay(1);
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        private Task ProcessPacket(MemoryStream stream)
+        {
+            int packetId = stream.ReadVarInt();
+
+            var packetType = PacketIdentifier.Instance.Identify(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState, packetId);
+
+            if (packetType != MinecraftPacketType.NotImplemented)
+            {
+                try
+                {
+                    Console.WriteLine(packetType);
+                    // Create a new instance of the packet class based on the packet type.
+                    var type = PacketIdentifier.Instance.GetTypeByType(packetType);
+                   
+                    if (type != null)
+                    {
+                        var packet = (Packet)Activator.CreateInstance(type);
+                        try
+                        {
+                            packet?.Decode(stream, MinecraftVersion.Ver_1_16_4);
+                        }catch(Exception e)
+                        {
+                            Console.WriteLine(e.ToString());
+                        }
+                    }
+                }catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            }
+
+
+
+
+            if (packetType == MinecraftPacketType.CB_Login_LoginSuccess)
+            {
+                ConnectionState = ConnectionState.Play;
+            }
+
+            if (packetType == MinecraftPacketType.CB_Play_KeepAlive)
+            {
+                Clientbound.Play.KeepAlivePacket request = new Clientbound.Play.KeepAlivePacket();
+                request.Decode(stream, MinecraftVersion.Ver_1_16_4);
+
+                MemoryStream responseStream = new MemoryStream();
+                Serverbound.Play.KeepAlivePacket response = new Serverbound.Play.KeepAlivePacket();
+                response.KeepAliveId = request.KeepAliveId;
+                response.Encode(responseStream, MinecraftVersion.Ver_1_16_4);
+                _networkStream.Write(responseStream.ToPacket().ToArray());
+            }
+
+            stream.Dispose();
+
+            return Task.CompletedTask;
         }
 
         public byte[] ReceiveData(int bufferSize)
@@ -95,7 +177,20 @@ namespace ConsoleClient
             stream.WriteString(_address);
             stream.WriteUnsignedShort(_port);
             stream.WriteVarInt(nextStep);
+
+            if (nextStep == 1)
+            {
+                ConnectionState = ConnectionState.Status;
+            }
+            if (nextStep == 2)
+            {
+                ConnectionState = ConnectionState.Login;
+            }
+
             _networkStream.Write(stream.ToPacket().ToArray());
+
+            
+
         }
 
         public void Login(string name = "Deus")
