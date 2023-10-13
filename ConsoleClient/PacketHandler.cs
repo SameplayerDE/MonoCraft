@@ -10,8 +10,33 @@ using System.Threading.Tasks;
 
 namespace ConsoleClient
 {
-    internal static class PacketHandler
+    public static class PacketHandler
     {
+
+        private static readonly Dictionary<MinecraftPacketType, Action<MemoryStream, MinecraftVersion, ConnectionState>> _packetHandlers = new();
+
+
+        public static void HandlePacket(MemoryStream stream, MinecraftVersion version, ConnectionState state)
+        {
+            // Get the packet type.
+            int packetId = stream.ReadVarInt();
+            var packetType = PacketIdentifier.Instance.Identify(version, PacketDirection.Clientbound, state, packetId);
+
+            // Call the appropriate packet handler.
+            if (_packetHandlers.TryGetValue(packetType, out var action))
+            {
+                action?.Invoke(stream, version, state);
+            }
+        }
+            
+
+        static PacketHandler()
+        {
+            _packetHandlers[MinecraftPacketType.CB_Login_LoginSuccess] = (stream, version, state) =>
+            {
+                Console.WriteLine("Login Success!!");
+            };
+        }
 
         private static PacketIdentifier Identifier = PacketIdentifier.Instance;
         

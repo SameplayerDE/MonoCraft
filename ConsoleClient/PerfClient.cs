@@ -106,8 +106,6 @@ namespace ConsoleClient
             {
                 try
                 {
-                    Console.WriteLine(packetType);
-                    // Create a new instance of the packet class based on the packet type.
                     var type = PacketIdentifier.Instance.GetTypeByType(packetType);
                    
                     if (type != null)
@@ -130,22 +128,22 @@ namespace ConsoleClient
 
 
 
-            if (packetType == MinecraftPacketType.CB_Login_LoginSuccess)
-            {
-                ConnectionState = ConnectionState.Play;
-            }
-
-            if (packetType == MinecraftPacketType.CB_Play_KeepAlive)
-            {
-                Clientbound.Play.KeepAlivePacket request = new Clientbound.Play.KeepAlivePacket();
-                request.Decode(stream, MinecraftVersion.Ver_1_16_4);
-
-                MemoryStream responseStream = new MemoryStream();
-                Serverbound.Play.KeepAlivePacket response = new Serverbound.Play.KeepAlivePacket();
-                response.KeepAliveId = request.KeepAliveId;
-                response.Encode(responseStream, MinecraftVersion.Ver_1_16_4);
-                _networkStream.Write(responseStream.ToPacket().ToArray());
-            }
+            //if (packetType == MinecraftPacketType.CB_Login_LoginSuccess)
+            //{
+            //    ConnectionState = ConnectionState.Play;
+            //}
+            //
+            //if (packetType == MinecraftPacketType.CB_Play_KeepAlive)
+            //{
+            //    Clientbound.Play.KeepAlivePacket request = new Clientbound.Play.KeepAlivePacket();
+            //    request.Decode(stream, MinecraftVersion.Ver_1_16_4);
+            //
+            //    MemoryStream responseStream = new MemoryStream();
+            //    Serverbound.Play.KeepAlivePacket response = new Serverbound.Play.KeepAlivePacket();
+            //    response.KeepAliveId = request.KeepAliveId;
+            //    response.Encode(responseStream, MinecraftVersion.Ver_1_16_4);
+            //    _networkStream.Write(responseStream.ToPacket().ToArray());
+            //}
 
             stream.Dispose();
 

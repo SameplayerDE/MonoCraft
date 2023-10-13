@@ -16,20 +16,20 @@ using ConnectionState = MonoCraft.Net.Predefined.Enums.ConnectionState;
 
 namespace ConsoleClient
 {
-    class Player
+    public class Player
     {
         public double X, Y, Z;
         public double VelX, VelZ;
         public float Yaw, Pitch;
     }
 
-    class PacketStream
+    public class PacketStream
     {
         public int PacketLength;
         public byte[] Data;
     }
 
-    internal class NetClient
+    public class NetClient
     {
         private Thread _readThread;
         private Thread _sendThread;
