@@ -18,8 +18,10 @@ public class PacketIdentifier
     {
 
         _typeMap[MinecraftPacketType.CB_Play_KeepAlive] = typeof(MonoCraft.Net.Predefined.Clientbound.Play.KeepAlivePacket);
-
-
+        
+        Map1202Clientbound();
+        Map1202Serverbound();
+        
         Map1164Clientbound();
         Map1164Serverbound();
     }
@@ -59,7 +61,29 @@ public class PacketIdentifier
         }
         return -1;
     }
+    
+    private void Map1202Serverbound()
+    {
+        Map(MinecraftVersion.Ver_1_20_2, PacketDirection.Serverbound, ConnectionState.Play, 0x14, MinecraftPacketType.SB_Play_KeepAlive);
+    }
 
+    private void Map1202Clientbound()
+    {
+        var version = MinecraftVersion.Ver_1_20_2;
+        var direction = PacketDirection.Clientbound;
+        
+        Map(version, direction, ConnectionState.Login, 0x00, MinecraftPacketType.CB_Login_Disconnect);
+        Map(version, direction, ConnectionState.Login, 0x01, MinecraftPacketType.CB_Login_EncryptionRequest);
+        Map(version, direction, ConnectionState.Login, 0x02, MinecraftPacketType.CB_Login_LoginSuccess);
+        Map(version, direction, ConnectionState.Login, 0x03, MinecraftPacketType.CB_Login_SetCompression);
+        Map(version, direction, ConnectionState.Login, 0x04, MinecraftPacketType.CB_Login_LoginPluginRequest);
+        
+        Map(version, direction, ConnectionState.Configuration, 0x02, MinecraftPacketType.CB_Config_FinishConfiguration);
+        Map(version, direction, ConnectionState.Configuration, 0x03, MinecraftPacketType.CB_Config_KeepAlive);
+        
+        Map(version, direction, ConnectionState.Play, 0x24, MinecraftPacketType.CB_Play_KeepAlive);
+    }
+    
     private void Map1164Clientbound()
     {
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Login, 0x00, MinecraftPacketType.CB_Login_Disconnect);

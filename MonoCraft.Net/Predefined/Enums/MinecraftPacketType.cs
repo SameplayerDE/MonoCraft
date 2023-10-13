@@ -19,6 +19,19 @@ public enum MinecraftPacketType
     SB_Login_LoginStart,
     SB_Login_EncryptionResponse,
     SB_Login_LoginPluginResponse,
+    SB_Login_LoginAcknowledged,
+    
+    CB_Config_PluginMessage,
+    CB_Config_Disconnect,
+    CB_Config_FinishConfiguration,
+    CB_Config_KeepAlive,
+    CB_Config_Ping,
+    CB_Config_RegistryData,
+    SB_Config_ClientInformation,
+    SB_Config_PluginMessage,
+    SB_Config_FinishConfiguration,
+    SB_Config_KeepAlive,
+    
     
     CB_Play_SpawnEntity,
     CB_Play_SpawnExperienceOrb,
@@ -113,5 +126,7 @@ public enum MinecraftPacketType
     CB_Play_DeclareRecipes,
     CB_Play_Tags,
     SB_Play_,
+    
     SB_Play_KeepAlive,
+    
 }

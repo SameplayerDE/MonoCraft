@@ -8,22 +8,92 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
+using MonoCraft.Core.Net;
 
 namespace ConsoleClient
 {
     public static class PacketHandler
     {
 
+
+        private static long lastId;
+        public static int count = 0;
+        
         private static readonly Dictionary<MinecraftPacketType, Action<MemoryStream, MinecraftVersion, ConnectionState>> _packetHandlers = new();
 
 
-        public static void HandlePacket(MemoryStream stream, MinecraftVersion version, ConnectionState state)
+        public static void HandlePacket(Client client, MemoryStream stream, MinecraftVersion version, ConnectionState state)
         {
             int packetId = stream.ReadVarInt();
             var packetType = PacketIdentifier.Instance.Identify(version, PacketDirection.Clientbound, state, packetId);
-
+            
+            Console.WriteLine("0x{0:x2} : {1}", packetId, packetType);
+            
             if (packetType != MinecraftPacketType.NotImplemented)
             {
+                if (packetType == MinecraftPacketType.CB_Login_LoginSuccess)
+                {
+                    if (version == MinecraftVersion.Ver_1_20_2)
+                    {
+                        var packet = new MemoryStream();
+                        packet.WriteVarInt(0x03);
+                        client.GetStream().Write(packet.ToPacket().ToArray());
+                        ((PerfClient)client).ConnectionState = ConnectionState.Configuration;
+                    }
+                    else
+                    {
+                        ((PerfClient)client).ConnectionState = ConnectionState.Play;
+                    }
+                }
+                
+                if (packetType == MinecraftPacketType.CB_Config_FinishConfiguration)
+                {
+                    if (version == MinecraftVersion.Ver_1_20_2)
+                    {
+                        var packet = new MemoryStream();
+                        packet.WriteVarInt(0x02);
+                        client.GetStream().Write(packet.ToPacket().ToArray());
+                        ((PerfClient)client).ConnectionState = ConnectionState.Play;
+                    }
+                }
+
+                if (packetId == 0x29)
+                {
+                                            
+                    var packet = new MemoryStream();
+                    packet.WriteVarInt(0x14);
+                    packet.WriteLong(lastId);
+                    client.GetStream().Write(packet.ToPacket().ToArray());
+                    Console.WriteLine("Sent ID");
+                }
+                
+                if (packetType == MinecraftPacketType.CB_Play_KeepAlive)
+                {
+                    if (version == MinecraftVersion.Ver_1_20_2)
+                    {
+
+                        lastId = stream.ReadLong();
+                        if (count >= 1)
+                        {
+                                            
+                            var packet = new MemoryStream();
+                            packet.WriteVarInt(0x14);
+                            packet.WriteLong(lastId);
+                            client.GetStream().Write(packet.ToPacket().ToArray());
+                            Console.WriteLine("Sent ID");
+                        }
+
+                        count++;
+                    }
+                    if (version == MinecraftVersion.Ver_1_16_4)
+                    {
+                        var packet = new MemoryStream();
+                        packet.WriteVarInt(0x10);
+                        packet.WriteLong(stream.ReadLong());
+                        client.GetStream().Write(packet.ToPacket().ToArray());
+                    }
+                }
+                
                 if (_packetHandlers.TryGetValue(packetType, out var action))
                 {
                     action?.Invoke(stream, version, state);
@@ -34,16 +104,16 @@ namespace ConsoleClient
 
         static PacketHandler()
         {
-            _packetHandlers[MinecraftPacketType.CB_Login_LoginSuccess] = (stream, version, state) =>
-            {
-                Console.WriteLine("Login Success!!");
-            };
-            _packetHandlers[MinecraftPacketType.CB_Play_KeepAlive] = (stream, version, state) =>
-            {
-                Clientbound.Play.KeepAlivePacket request = new Clientbound.Play.KeepAlivePacket();
-                request.Decode(stream, version);
-                Console.WriteLine("Keep-Alive {0}", request.KeepAliveId);
-            };
+            //_packetHandlers[MinecraftPacketType.CB_Login_LoginSuccess] = (stream, version, state) =>
+            //{
+            //    Console.WriteLine("Login Success!!");
+            //};
+            //_packetHandlers[MinecraftPacketType.CB_Play_KeepAlive] = (stream, version, state) =>
+            //{
+            //    Clientbound.Play.KeepAlivePacket request = new Clientbound.Play.KeepAlivePacket();
+            //    request.Decode(stream, version);
+            //    Console.WriteLine("Keep-Alive {0}", request.KeepAliveId);
+            //};
         }
 
         private static PacketIdentifier Identifier = PacketIdentifier.Instance;

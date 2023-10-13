@@ -12,8 +12,8 @@ namespace MonoCraft.Net.Predefined.Serverbound.Handshake
 
         public enum State
         {
-            STATUS = 0x01,
-            LOGIN = 0x02
+            Status = 0x01,
+            Login = 0x02
         }
 
         public int ProtocolVersion;

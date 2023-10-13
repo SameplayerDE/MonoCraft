@@ -113,7 +113,17 @@ namespace MonoCraft.Net
             stream.WritePosition(position.X, position.Y, position.Z);
         }
         public static void WriteAngle(this Stream stream, sbyte value) { throw new NotImplementedException(); }
-        public static void WriteUUID(this Stream stream, Guid value) { throw new NotImplementedException(); }
+
+        public static void WriteUUID(this Stream stream, Guid value)
+        {
+            var guid = value.ToByteArray();
+            var long1 = new byte[8];
+            var long2 = new byte[8];
+            Array.Copy(guid, 0, long1, 0, 8);
+            Array.Copy(guid, 8, long2, 0, 8);
+            stream.Write(long1);
+            stream.Write(long2);
+        }
 
         public static bool ReadBool(this Stream stream)
         {
@@ -290,7 +300,17 @@ namespace MonoCraft.Net
         {
             return stream.ReadSignedByte();
         }
-        public static Guid ReadUUID(this Stream stream) { throw new NotImplementedException(); }
+
+        public static Guid ReadUUID(this Stream stream)
+        {
+            int length = 16;
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < length; i++)
+            {
+                builder.Append(stream.ReadUByte().ToString("X2"));
+            }
+            return new Guid(builder.ToString());
+        }
         public static byte[] ReadBytes(this Stream stream, int amount)
         {
             var buffer = new byte[amount];

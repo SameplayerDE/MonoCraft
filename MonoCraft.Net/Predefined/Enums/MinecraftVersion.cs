@@ -8,6 +8,8 @@ namespace MonoCraft.Net.Predefined.Enums
 {
     public enum MinecraftVersion
     {
+        _1202,
+        _100,
         Ver_1_0_0,
         Ver_1_0_1,
         Ver_1_1,

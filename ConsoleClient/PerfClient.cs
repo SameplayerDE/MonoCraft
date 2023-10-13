@@ -1,35 +1,24 @@
 ﻿using MonoCraft.Net;
 using MonoCraft.Net.Predefined.Enums;
-using Clientbound = MonoCraft.Net.Predefined.Clientbound;
-using Serverbound = MonoCraft.Net.Predefined.Serverbound;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Cryptography.X509Certificates;
-using System.Runtime.CompilerServices;
 using MonoCraft.Core.Net;
 
 namespace ConsoleClient
 {
     public class PerfClient : Client
     {
-
         private Thread _readThread;
 
         public ConnectionState ConnectionState;
+        public MinecraftVersion MinecraftVersion;
 
-        public PerfClient() : base()
+        public PerfClient(MinecraftVersion version) : base()
         {
+            MinecraftVersion = version;
             ConnectionState = ConnectionState.Handshake;
 
             ConnectionEstablished += () =>
             {
-                Handshake((int)MinecraftVersion.Ver_1_16_4, 2);
+                Handshake((int)MinecraftVersion, 2);
                 Login("Oktay");
                 _readThread = new Thread(Read);
                 _readThread.IsBackground = true;
@@ -62,7 +51,7 @@ namespace ConsoleClient
                     }
                     else
                     {
-                        await Task.Delay(1);
+                        await Task.Delay(10);
                     }
                 }
             }
@@ -75,7 +64,7 @@ namespace ConsoleClient
         private Task ProcessPacket(MemoryStream stream)
         {
 
-            PacketHandler.HandlePacket(stream, MinecraftVersion.Ver_1_16_4, ConnectionState);
+            PacketHandler.HandlePacket(this, stream, MinecraftVersion, ConnectionState);
 
             //int packetId = stream.ReadVarInt();
             //
@@ -172,6 +161,10 @@ namespace ConsoleClient
             var stream = new MemoryStream();
             stream.WriteVarInt(0x00);
             stream.WriteString(name);
+            if (MinecraftVersion == MinecraftVersion.Ver_1_20_2)
+            {
+                stream.WriteUUID(Guid.NewGuid());
+            }
             GetStream().Write(stream.ToPacket().ToArray());
         }
 

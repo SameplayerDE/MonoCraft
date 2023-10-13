@@ -2,7 +2,7 @@
 using System;
 using MonoCraft.Net.Predefined.Enums;
 
-PerfClient client = new PerfClient ();
+PerfClient client = new PerfClient(MinecraftVersion.Ver_1_20_2);
 client.Connect("localhost", 25565);
 
 while (client.IsConnected)

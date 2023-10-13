@@ -25,6 +25,11 @@ namespace MonoCraft.Net.Predefined.Serverbound.Play
                 stream.WriteVarInt(PacketIdentifier.Instance.Identify(version, MinecraftPacketType.SB_Play_KeepAlive));
                 stream.WriteLong(KeepAliveId);
             }
+            if (version == MinecraftVersion.Ver_1_20_2)
+            {
+                stream.WriteVarInt(PacketIdentifier.Instance.Identify(version, MinecraftPacketType.SB_Play_KeepAlive));
+                stream.WriteLong(KeepAliveId);
+            }
         }
     }
 }
