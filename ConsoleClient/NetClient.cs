@@ -175,7 +175,17 @@ namespace ConsoleClient
                 {
                     if (_networkStream.DataAvailable)
                     {
-                        Console.WriteLine("Data to read");
+                        // Create a byte array to store the data that is read from the stream.
+                        byte[] data = new byte[_socket.Available];
+
+                        // Read the data from the stream into the byte array.
+                        _networkStream.Read(data, 0, data.Length);
+
+                        // Print the bytes in binary format to the console.
+                        foreach (byte b in data)
+                        {
+                            Console.WriteLine($"{b:X2}");
+                        }
                     }
                 }
                 if (_networkStream!.DataAvailable)
