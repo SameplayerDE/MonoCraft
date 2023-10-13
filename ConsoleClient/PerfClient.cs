@@ -12,53 +12,29 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography.X509Certificates;
 using System.Runtime.CompilerServices;
+using MonoCraft.Core.Net;
 
 namespace ConsoleClient
 {
-    public class PerfClient
+    public class PerfClient : Client
     {
 
-        private Socket _socket;
-        private NetworkStream _networkStream;
         private Thread _readThread;
 
-        private string _address;
-        private ushort _port;
-
-        public bool IsConnected => _socket.Connected;
-        public int Available => _socket.Available;
         public ConnectionState ConnectionState;
 
-        public PerfClient()
+        public PerfClient() : base()
         {
-            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             ConnectionState = ConnectionState.Handshake;
-        }
 
-        public void Connect(string address, ushort port)
-        {
-            _address = address;
-            _port = port;
-            try
+            ConnectionEstablished += () =>
             {
-                _socket.Connect(address, port);
-
-                if (IsConnected)
-                {
-                    _networkStream = new NetworkStream(_socket, true);
-                    Handshake((int)MinecraftVersion.Ver_1_16_4, 2);
-                    Login("Oktay");
-
-                    _readThread = new Thread(Read);
-                    _readThread.IsBackground = true;
-                    _readThread.Start();
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+                Handshake((int)MinecraftVersion.Ver_1_16_4, 2);
+                Login("Oktay");
+                _readThread = new Thread(Read);
+                _readThread.IsBackground = true;
+                _readThread.Start();
+            };
         }
 
         private async void Read(object? obj)
@@ -68,7 +44,7 @@ namespace ConsoleClient
                 while (IsConnected)
                 {
 
-                    if (_networkStream == null)
+                    if (GetStream() == null)
                     {
                         break;
                     }
@@ -77,7 +53,7 @@ namespace ConsoleClient
                     {
                         try
                         {
-                            await ProcessPacket(new MemoryStream(ReceiveData(_networkStream.ReadVarInt())));
+                            await ProcessPacket(new MemoryStream(ReceiveData(GetStream().ReadVarInt())));
                         }
                         catch (Exception ex)
                         {
@@ -159,7 +135,7 @@ namespace ConsoleClient
 
             while (totalBytesRead < bufferSize)
             {
-                int bytesRead = _networkStream.Read(buffer, totalBytesRead, bufferSize - totalBytesRead);
+                int bytesRead = GetStream().Read(buffer, totalBytesRead, bufferSize - totalBytesRead);
                 if (bytesRead == 0)
                 {
                     throw new IOException("Verbindung geschlossen, bevor genügend Daten empfangen wurden.");
@@ -174,8 +150,8 @@ namespace ConsoleClient
             var stream = new MemoryStream();
             stream.WriteVarInt(0x00);
             stream.WriteVarInt(protocolVersion);
-            stream.WriteString(_address);
-            stream.WriteUnsignedShort(_port);
+            stream.WriteString(Address);
+            stream.WriteUnsignedShort(Port);
             stream.WriteVarInt(nextStep);
 
             if (nextStep == 1)
@@ -187,9 +163,7 @@ namespace ConsoleClient
                 ConnectionState = ConnectionState.Login;
             }
 
-            _networkStream.Write(stream.ToPacket().ToArray());
-
-            
+            GetStream().Write(stream.ToPacket().ToArray());
 
         }
 
@@ -198,8 +172,12 @@ namespace ConsoleClient
             var stream = new MemoryStream();
             stream.WriteVarInt(0x00);
             stream.WriteString(name);
-            _networkStream.Write(stream.ToPacket().ToArray());
+            GetStream().Write(stream.ToPacket().ToArray());
         }
 
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MonoCraft.Core\MonoCraft.Core.csproj" />
     <ProjectReference Include="..\MonoCraft.Net\MonoCraft.Net.csproj" />
   </ItemGroup>
 
