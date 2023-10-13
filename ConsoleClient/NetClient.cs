@@ -173,13 +173,12 @@ namespace ConsoleClient
             {
                 if (_networkStream != null)
                 {
-                    Console.WriteLine("NOT NULL");
                     if (_networkStream.DataAvailable)
                     {
                         Console.WriteLine("Data to read");
                     }
                 }
-                if (_networkStream.DataAvailable)
+                if (_networkStream!.DataAvailable)
                 {
                     int packetLength = _networkStream.ReadVarInt();
 
