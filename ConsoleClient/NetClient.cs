@@ -161,7 +161,7 @@ namespace ConsoleClient
                 else
                 {
                     Console.WriteLine("Nothing to send");
-                    Thread.Sleep(1);
+                    Thread.Sleep(10);
                 }
             }
         }
@@ -171,6 +171,14 @@ namespace ConsoleClient
             Console.WriteLine("Called Read");
             while (IsConnected)
             {
+                if (_networkStream != null)
+                {
+                    Console.WriteLine("NOT NULL");
+                    if (_networkStream.DataAvailable)
+                    {
+                        Console.WriteLine("Data to read");
+                    }
+                }
                 if (_networkStream.DataAvailable)
                 {
                     int packetLength = _networkStream.ReadVarInt();
