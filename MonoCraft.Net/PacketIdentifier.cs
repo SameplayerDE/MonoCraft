@@ -15,13 +15,33 @@ public class PacketIdentifier
 
     private PacketIdentifier()
     {
+        Map1164Clientbound();
+        Map1164Serverbound();
+    }
+
+    public void Map(MinecraftVersion version, PacketDirection direction, ConnectionState connectionState, int packetId, MinecraftPacketType type)
+    {
+        _map[(version, direction, connectionState, packetId)] = type;
+    }
+
+    public MinecraftPacketType Identify(MinecraftVersion version, PacketDirection direction, ConnectionState connectionState, int packetId)
+    {
+        if (_map.TryGetValue((version, direction, connectionState, packetId), out var packetType))
+        {
+            return packetType;
+        }
+        return MinecraftPacketType.NotImplemented;
+        throw new Exception("packet with this id does not exist for this minecraft version");
+    }
+    
+    private void Map1164Clientbound()
+    {
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Login, 0x00, MinecraftPacketType.CB_Login_Disconnect);
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Login, 0x01, MinecraftPacketType.CB_Login_EncryptionRequest);
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Login, 0x02, MinecraftPacketType.CB_Login_LoginSuccess);
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Login, 0x03, MinecraftPacketType.CB_Login_SetCompression);
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Login, 0x04, MinecraftPacketType.CB_Login_LoginPluginRequest);
 
-        // Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Play, 0x00, MinecraftPacketType.CB_Play_);
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Play, 0x00, MinecraftPacketType.CB_Play_SpawnEntity);
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Play, 0x01, MinecraftPacketType.CB_Play_SpawnExperienceOrb);
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Play, 0x02, MinecraftPacketType.CB_Play_SpawnLivingEntity);
@@ -121,19 +141,8 @@ public class PacketIdentifier
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Play, 0x5B, MinecraftPacketType.CB_Play_Tags);
     }
 
-    public void Map(MinecraftVersion version, PacketDirection direction, ConnectionState connectionState, int packetId, MinecraftPacketType type)
+    private void Map1164Serverbound()
     {
-        _map[(version, direction, connectionState, packetId)] = type;
-    }
 
-    public MinecraftPacketType Identify(MinecraftVersion version, PacketDirection direction, ConnectionState connectionState, int packetId)
-    {
-        if (_map.TryGetValue((version, direction, connectionState, packetId), out var packetType))
-        {
-            return packetType;
-        }
-        return MinecraftPacketType.NotImplemented;
-        throw new Exception("packet with this id does not exist for this minecraft version");
     }
-    
 }

@@ -23,7 +23,7 @@ namespace ConsoleClient
             
             if (packetType != MinecraftPacketType.NotImplemented)
             {
-                Console.WriteLine(packetType.ToString());
+                //Console.WriteLine(packetType.ToString());
             }
 
             if (packetType == MinecraftPacketType.CB_Login_EncryptionRequest)

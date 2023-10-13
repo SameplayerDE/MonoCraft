@@ -242,6 +242,7 @@ namespace ConsoleClient
                     throw new IOException("Verbindung geschlossen, bevor genügend Daten empfangen wurden.");
                 }
                 totalBytesRead += bytesRead;
+                Console.WriteLine("Read {0} / {1}", totalBytesRead, bufferSize);
             }
 
             InQueue.Enqueue(new MemoryStream(buffer));
