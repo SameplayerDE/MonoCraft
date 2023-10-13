@@ -83,6 +83,23 @@ namespace ConsoleClient
             }
         }
 
+        public void Connect(string address, ushort port)
+        {
+            _address = address;
+            _port = port;
+            //_ipAddress = IPAddress.Parse(_address);
+            //_ipEndPoint = new IPEndPoint(_ipAddress, _port);
+
+            _socket.Connect(_address, _port);
+
+            if (_socket.Connected)
+            {
+                IsConnected = true;
+                _networkStream = new NetworkStream(_socket, true);
+                OnConnectionEstablished?.Invoke();
+            }
+        }
+
         public async Task DisconnectAsync()
         {
             await _socket.DisconnectAsync(false);

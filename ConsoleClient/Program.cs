@@ -6,7 +6,7 @@ NetClient client = new NetClient(MinecraftVersion.Ver_1_16_4);
 client.OnConnectionEstablished += Init;
 //client.OnServerTick += () => client.Chat("Tick");
 
-await client.ConnectAsync("localhost", 25565);
+client.Connect("localhost", 25565);
 
 Player Player = client.Player;
 Random random = new Random();
