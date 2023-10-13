@@ -188,35 +188,39 @@ namespace ConsoleClient
             Console.WriteLine("Called Read");
             while (IsConnected)
             {
-                if (_networkStream != null)
+               //if (_networkStream != null)
+               //{
+               //    if (_networkStream.DataAvailable)
+               //    {
+               //        // Create a byte array to store the data that is read from the stream.
+               //        byte[] data = new byte[_socket.Available];
+               //
+               //        // Read the data from the stream into the byte array.
+               //        _networkStream.Read(data, 0, data.Length);
+               //
+               //        // Print the bytes in binary format to the console.
+               //        foreach (byte b in data)
+               //        {
+               //            Console.WriteLine($"{b:X2}");
+               //        }
+               //    }
+               //}
+                if (_networkStream.DataAvailable)
                 {
-                    if (_networkStream.DataAvailable)
+
+                    if (_socket.Available >= 10)
                     {
-                        // Create a byte array to store the data that is read from the stream.
-                        byte[] data = new byte[_socket.Available];
+                        int packetLength = _networkStream.ReadVarInt();
 
-                        // Read the data from the stream into the byte array.
-                        _networkStream.Read(data, 0, data.Length);
-
-                        // Print the bytes in binary format to the console.
-                        foreach (byte b in data)
+                        if (CompressionThreshold >= 0)
                         {
-                            Console.WriteLine($"{b:X2}");
+                            if (packetLength >= CompressionThreshold)
+                            {
+                                // packet is compressed
+                            }
                         }
+                        await ReceiveDataAsync(packetLength);
                     }
-                }
-                if (_networkStream!.DataAvailable)
-                {
-                    int packetLength = _networkStream.ReadVarInt();
-
-                    if (CompressionThreshold >= 0)
-                    {
-                        if (packetLength >= CompressionThreshold)
-                        {
-                            // packet is compressed
-                        }
-                    }
-                    await ReceiveDataAsync(packetLength);
                 }
             }
         }
