@@ -140,6 +140,7 @@ namespace ConsoleClient
 
         private void Send(object? obj)
         {
+            Console.WriteLine("Called Send");
             while (IsConnected)
             {
                 if (OutQueue.Count > 0)
@@ -159,6 +160,7 @@ namespace ConsoleClient
                 }
                 else
                 {
+                    Console.WriteLine("Nothing to send");
                     Thread.Sleep(1);
                 }
             }
@@ -166,6 +168,7 @@ namespace ConsoleClient
 
         private async void Read(object? obj)
         {
+            Console.WriteLine("Called Read");
             while (IsConnected)
             {
                 if (_networkStream.DataAvailable)
@@ -205,6 +208,7 @@ namespace ConsoleClient
             {
                 byte[] data = memoryStream.ToArray();
                 await _networkStream.WriteAsync(data, 0, data.Length);
+                Console.WriteLine("Send Data To Server");
             }
         }
 
@@ -251,6 +255,7 @@ namespace ConsoleClient
 
         public void Handshake(int protocolVersion, int nextStep = 1)
         {
+            Console.WriteLine("Called Handshake");
             ConnectionState = ConnectionState.Handshake;
             var stream = new MemoryStream();
             stream.WriteVarInt(0x00);
@@ -264,6 +269,7 @@ namespace ConsoleClient
 
         public void Login(string name = "Deus")
         {
+            Console.WriteLine("Called Login");
             var stream = new MemoryStream();
             stream.WriteVarInt(0x00);
             stream.WriteString(name);
