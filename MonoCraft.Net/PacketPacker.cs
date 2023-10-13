@@ -31,9 +31,11 @@ namespace MonoCraft.Net
             if (threshold >= 0)
             {
                 int compressionLength;
-                int isCompressed = packetStream.ReadVarInt(out compressionLength);
+                //int isCompressed = packetStream.ReadVarInt(out compressionLength);
 
             }
+
+            return null;
         }
 
     }

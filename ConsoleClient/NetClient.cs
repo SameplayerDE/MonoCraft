@@ -52,7 +52,7 @@ namespace ConsoleClient
         public int CompressionThreshold = -1;
 
         public ConcurrentQueue<MemoryStream> OutQueue { get; private set; } = new();
-        public ConcurrentQueue<PacketStream> InQueue { get; private set; } = new();
+        public ConcurrentQueue<MemoryStream> InQueue { get; private set; } = new();
 
         public Player Player;
 
@@ -115,51 +115,13 @@ namespace ConsoleClient
                 {
                     try
                     {
-                        if (InQueue.TryDequeue(out var data))
+                        if (InQueue.TryDequeue(out var packet))
                         {
-                            if (data == null)
+                            if (packet == null)
                             {
                                 continue;
                             }
-
-                            var packet = new MemoryStream(data.Data);
-                            bool isCompressed = false;
-                            int dataLength = 0;
-
-                            if (CompressionThreshold >= 0)
-                            {
-                                if (data.PacketLength >= CompressionThreshold)
-                                {
-                                    dataLength = packet.ReadVarInt();
-                                    isCompressed = dataLength > 0;
-                                }
-                            }
-
-                            if (isCompressed)
-                            {
-                                //// Create a ZLibStream with the MemoryStream as the source stream.
-                                //ZLibStream zlibStream = new ZLibStream(new MemoryStream(data.Data), CompressionMode.Decompress);
-                                //
-                                //// Read the decompressed data from the ZLibStream.
-                                //byte[] decompressedData = new byte[zlibStream.Length];
-                                //zlibStream.Read(decompressedData, 0, decompressedData.Length);
-
-                                //using (MemoryStream compressedStream = new MemoryStream(packet.ReadBytes(10)))
-                                //{
-                                //    using (MemoryStream decompressedStream = new MemoryStream())
-                                //    {
-                                //        using (DeflateStream deflateStream = new DeflateStream(compressedStream, CompressionMode.Decompress))
-                                //        {
-                                //            deflateStream.CopyTo(decompressedStream);
-                                //        }
-                                //        Console.WriteLine("{0:x2}", decompressedStream.ReadVarInt());
-                                //    }
-                                //}
-                            }
-                            else
-                            {
-                                PacketHandler.HandlePacket(packet, this); //Uncompressed
-                            }
+                            PacketHandler.HandlePacket(packet, this);
                         }
                     }
                     catch (Exception e)
@@ -202,7 +164,7 @@ namespace ConsoleClient
             }
         }
 
-        private void Read(object? obj)
+        private async void Read(object? obj)
         {
             while (IsConnected)
             {
@@ -217,7 +179,7 @@ namespace ConsoleClient
                             // packet is compressed
                         }
                     }
-                    ReceiveDataAsync(packetLength);
+                    await ReceiveDataAsync(packetLength);
                 }
             }
         }
@@ -281,11 +243,8 @@ namespace ConsoleClient
                 }
                 totalBytesRead += bytesRead;
             }
-            InQueue.Enqueue(new PacketStream()
-            {
-                Data = buffer,
-                PacketLength = bufferSize
-            });
+
+            InQueue.Enqueue(new MemoryStream(buffer));
             return buffer;
         }
 
