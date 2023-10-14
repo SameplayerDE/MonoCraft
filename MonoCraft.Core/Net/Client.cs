@@ -90,6 +90,12 @@ namespace MonoCraft.Core.Net
                 Console.WriteLine(ex.ToString());
             }
         }
+
+        public void ReConnect()
+        {
+            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Connect(Address, Port);
+        }
         
         public virtual void Close()
         {

@@ -1,6 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
+using ConsoleClient;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoCraft.Net.Predefined;
+using Newtonsoft.Json;
 
 namespace MonoCraft.App;
 
@@ -8,10 +14,35 @@ public class Game1 : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
+
+    private string _json;
+    private ServerStatusResponse _response;
     private Texture2D _image;
+    private SpriteFont _font;
+    private StatusChecker _checker;
     
     public Game1()
     {
+        
+        
+        string address = "MC.HYPIXEL.NET";
+        ushort port = 25565;
+
+        _checker = new StatusChecker();
+        _checker.StatusUpdated += r =>
+        {
+            Console.WriteLine(r.PlayerList.Online);
+            _response = r;
+        };
+        
+        _checker.Connect(address, port);
+        while (_checker.Response == null)
+        {
+    
+        }
+        byte[] imageBytes = Convert.FromBase64String(_checker.Response.FaviconBase64.Replace("data:image/png;base64,", ""));
+        File.WriteAllBytes("image.png", imageBytes);
+        
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
@@ -26,6 +57,7 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _image = Texture2D.FromFile(GraphicsDevice, "image.png");
+        _font = Content.Load<SpriteFont>("font");
     }
 
     protected override void Update(GameTime gameTime)
@@ -34,10 +66,10 @@ public class Game1 : Game
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        // TODO: Add your update logic here
-
         base.Update(gameTime);
     }
+    
+    
 
     protected override void Draw(GameTime gameTime)
     {
@@ -47,6 +79,15 @@ public class Game1 : Game
         
         // render server icon
         _spriteBatch.Draw(_image, GraphicsDevice.Viewport.Bounds.Center.ToVector2(), null, Color.White, 0f, _image.Bounds.Center.ToVector2(), 5f, SpriteEffects.None, 0f);
+
+        var position = GraphicsDevice.Viewport.Bounds.Center.ToVector2();
+        position.Y += _image.Height / 2f * 5f;
+        position.X -= _image.Width / 2f * 5f;
+        
+        _spriteBatch.DrawString(_font, _response.Version.Name, position, Color.White);
+        position.Y += _font.LineSpacing;
+        string playerString = string.Format("Online: {0} / {1}", _response.PlayerList.Online, _response.PlayerList.Max);
+        _spriteBatch.DrawString(_font, playerString, position, Color.White);
         
         _spriteBatch.End();
         
