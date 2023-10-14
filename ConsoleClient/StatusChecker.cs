@@ -10,6 +10,7 @@ public class StatusChecker : Client
 {
 
     public ServerStatusResponse Response;
+    public string JsonString;
     
     public StatusChecker()
     {
@@ -59,7 +60,8 @@ public class StatusChecker : Client
                         int packetLength = GetStream().ReadVarInt();
                         var stream = new MemoryStream(ReceiveData(packetLength));
                         int id = stream.ReadVarInt();
-                        var response = JsonConvert.DeserializeObject<ServerStatusResponse>(stream.ReadString());
+                        JsonString = stream.ReadString();
+                        var response = JsonConvert.DeserializeObject<ServerStatusResponse>(JsonString);
                         return response;
                     }
                     catch (Exception ex)

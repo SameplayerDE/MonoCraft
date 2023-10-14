@@ -9,8 +9,10 @@ public class ServerStatusResponse
     public ServerStatusResponseVersion Version;
     [JsonProperty("players")]
     public ServerStatusResponsePlayerList PlayerList;
-    [JsonProperty("description")]
-    public ServerStatusResponseDescription Description;
+    //[JsonProperty("description")]
+    //public ServerStatusResponseDescription Description;
+    [JsonProperty("favicon")]
+    public string FaviconBase64;
 }
 
 public class ServerStatusResponseVersion
@@ -32,5 +34,17 @@ public class ServerStatusResponsePlayerList
 public class ServerStatusResponseDescription
 {
     [JsonProperty("text")]
-    public string Content;
+    public string Text;
+    [JsonProperty("extra")]
+    public List<ServerStatusResponseDescriptionElement> Extra;
+}
+
+public class ServerStatusResponseDescriptionElement
+{
+    [JsonProperty("text")]
+    public string Text;
+    [JsonProperty("bold")]
+    public bool Bold;
+    [JsonProperty("color")]
+    public string Color;
 }

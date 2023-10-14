@@ -67,6 +67,42 @@ namespace MonoCraft.Core.Net
             }
         }
 
+        public virtual void Disconnect(bool reuse = false)
+        {
+            try
+            {
+                _socket.Disconnect(reuse);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+        
+        public virtual async Task DisconnectAsync(bool reuse = false)
+        {
+            try
+            {
+                await _socket.DisconnectAsync(reuse);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+        
+        public virtual void Close()
+        {
+            try
+            {
+                _socket.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
         public NetworkStream GetStream() { return _networkStream; }
 
     }

@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ionic.Zlib.Core" Version="1.0.0" />
+    <PackageReference Include="Spectre.Console.ImageSharp" Version="0.47.1-preview.0.26" />
   </ItemGroup>
 
   <ItemGroup>

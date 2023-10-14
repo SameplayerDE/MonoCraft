@@ -38,6 +38,7 @@ public enum MinecraftPacketType
     CB_Play_SpawnLivingEntity,
     CB_Play_SpawnPainting,
     CB_Play_SpawnPlayer,
+    CB_Play_SculkVibrationSignal, //1.17
     CB_Play_EntityAnimation,
     CB_Play_Statistics,
     CB_Play_AcknowledgePlayerDigging,
@@ -48,6 +49,7 @@ public enum MinecraftPacketType
     CB_Play_BossBar,
     CB_Play_ServerDifficulty,
     CB_Play_ChatMessage,
+    CB_Play_ClearTitles, //1.17
     CB_Play_TabComplete,
     CB_Play_DeclareCommands,
     CB_Play_WindowConfirmation,
@@ -64,6 +66,7 @@ public enum MinecraftPacketType
     CB_Play_UnloadChunk,
     CB_Play_ChangeGameState,
     CB_Play_OpenHorseWindow,
+    CB_Play_InitializeWorldBorder, //1.17
     CB_Play_KeepAlive,
     CB_Play_ChunkData,
     CB_Play_Effect,

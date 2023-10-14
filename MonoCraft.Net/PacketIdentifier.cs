@@ -16,17 +16,15 @@ public class PacketIdentifier
 
     private PacketIdentifier()
     {
-
         _typeMap[MinecraftPacketType.CB_Play_KeepAlive] = typeof(MonoCraft.Net.Predefined.Clientbound.Play.KeepAlivePacket);
         
-        Map1202Clientbound();
-        Map1202Serverbound();
-        
-        Map_1_17_Clientbound();
-        Map_1_17_Serverbound();
-        
-        Map1164Clientbound();
-        Map1164Serverbound();
+        Map_1_20_2();
+        Map_1_20_1();
+        Map_1_20();
+        Map_1_19();
+        Map_1_18();
+        Map_1_17();
+        Map_1_16_4();
     }
 
     public void Map(MinecraftVersion version, PacketDirection direction, ConnectionState connectionState, int packetId, MinecraftPacketType type)
@@ -65,6 +63,80 @@ public class PacketIdentifier
         return -1;
     }
 
+    private void Map_1_20_2()
+    {
+        Map_1_20_2_Clientbound();
+        Map_1_20_2_Serverbound();
+    }
+    private void Map_1_20_1()
+    {
+        Map_1_20_1_Clientbound();
+        Map_1_20_1_Serverbound();
+    }
+    private void Map_1_20()
+    {
+        Map_1_20_Clientbound();
+        Map_1_20_Serverbound();
+    }
+    private void Map_1_19()
+    {
+        Map_1_19_Clientbound();
+        Map_1_19_Serverbound();
+    }
+    private void Map_1_18()
+    {
+        Map_1_18_Clientbound();
+        Map_1_18_Serverbound();
+    }
+    private void Map_1_17()
+    {
+        Map_1_17_Clientbound();
+        Map_1_17_Serverbound();
+    }
+    private void Map_1_16_4()
+    {
+        Map_1_16_4_Clientbound();
+        Map_1_16_4_Serverbound();
+    }
+    
+    private void Map_1_20_2_Serverbound()
+    {
+        Map(MinecraftVersion.Ver_1_20_2, PacketDirection.Serverbound, ConnectionState.Play, 0x14, MinecraftPacketType.SB_Play_KeepAlive);
+    }
+
+    private void Map_1_20_2_Clientbound()
+    {
+        var version = MinecraftVersion.Ver_1_20_2;
+        var direction = PacketDirection.Clientbound;
+        
+        Map(version, direction, ConnectionState.Login, 0x00, MinecraftPacketType.CB_Login_Disconnect);
+        Map(version, direction, ConnectionState.Login, 0x01, MinecraftPacketType.CB_Login_EncryptionRequest);
+        Map(version, direction, ConnectionState.Login, 0x02, MinecraftPacketType.CB_Login_LoginSuccess);
+        Map(version, direction, ConnectionState.Login, 0x03, MinecraftPacketType.CB_Login_SetCompression);
+        Map(version, direction, ConnectionState.Login, 0x04, MinecraftPacketType.CB_Login_LoginPluginRequest);
+        
+        Map(version, direction, ConnectionState.Configuration, 0x02, MinecraftPacketType.CB_Config_FinishConfiguration);
+        Map(version, direction, ConnectionState.Configuration, 0x03, MinecraftPacketType.CB_Config_KeepAlive);
+        
+        Map(version, direction, ConnectionState.Play, 0x24, MinecraftPacketType.CB_Play_KeepAlive);
+    }
+    
+    private void Map_1_20_1_Serverbound() {}
+    
+    private void Map_1_20_1_Clientbound() {}
+    
+    private void Map_1_20_Serverbound() {}
+    
+    private void Map_1_20_Clientbound() {}
+    
+    private void Map_1_19_Clientbound() {}
+    
+    private void Map_1_19_Serverbound() {}
+    
+    private void Map_1_18_Clientbound() {}
+    
+    private void Map_1_18_Serverbound() {}
+    
     private void Map_1_17_Serverbound()
     {
         var version = MinecraftVersion.Ver_1_17;
@@ -90,7 +162,7 @@ public class PacketIdentifier
         Map(version, direction, ConnectionState.Play, 0x02, MinecraftPacketType.CB_Play_SpawnLivingEntity);
         Map(version, direction, ConnectionState.Play, 0x03, MinecraftPacketType.CB_Play_SpawnPainting);
         Map(version, direction, ConnectionState.Play, 0x04, MinecraftPacketType.CB_Play_SpawnPlayer);
-        //Map(version, direction, ConnectionState.Play, 0x05, MinecraftPacketType.CB_Play_EntityAnimation);
+        Map(version, direction, ConnectionState.Play, 0x05, MinecraftPacketType.CB_Play_SculkVibrationSignal);
         Map(version, direction, ConnectionState.Play, 0x06, MinecraftPacketType.CB_Play_EntityAnimation);
         Map(version, direction, ConnectionState.Play, 0x07, MinecraftPacketType.CB_Play_Statistics);
         Map(version, direction, ConnectionState.Play, 0x08, MinecraftPacketType.CB_Play_AcknowledgePlayerDigging);
@@ -102,7 +174,7 @@ public class PacketIdentifier
         Map(version, direction, ConnectionState.Play, 0x0E, MinecraftPacketType.CB_Play_ServerDifficulty);
         Map(version, direction, ConnectionState.Play, 0x0F, MinecraftPacketType.CB_Play_ChatMessage);
         
-        //Map(version, direction, ConnectionState.Play, 0x10, MinecraftPacketType.CB_Play_TabComplete);
+        Map(version, direction, ConnectionState.Play, 0x10, MinecraftPacketType.CB_Play_ClearTitles);
         Map(version, direction, ConnectionState.Play, 0x11, MinecraftPacketType.CB_Play_TabComplete);
         Map(version, direction, ConnectionState.Play, 0x12, MinecraftPacketType.CB_Play_DeclareCommands);
         Map(version, direction, ConnectionState.Play, 0x13, MinecraftPacketType.CB_Play_CloseWindow);
@@ -119,7 +191,7 @@ public class PacketIdentifier
         Map(version, direction, ConnectionState.Play, 0x1E, MinecraftPacketType.CB_Play_ChangeGameState);
         Map(version, direction, ConnectionState.Play, 0x1F, MinecraftPacketType.CB_Play_OpenHorseWindow);
         
-        //Map(version, direction, ConnectionState.Play, 0x20, MinecraftPacketType.);
+        Map(version, direction, ConnectionState.Play, 0x20, MinecraftPacketType.CB_Play_InitializeWorldBorder);
         Map(version, direction, ConnectionState.Play, 0x21, MinecraftPacketType.CB_Play_KeepAlive);
         Map(version, direction, ConnectionState.Play, 0x22, MinecraftPacketType.CB_Play_ChunkData);
         Map(version, direction, ConnectionState.Play, 0x23, MinecraftPacketType.CB_Play_Effect);
@@ -196,29 +268,7 @@ public class PacketIdentifier
         Map(version, direction, ConnectionState.Play, 0x66, MinecraftPacketType.CB_Play_Tags);
     }
     
-    private void Map1202Serverbound()
-    {
-        Map(MinecraftVersion.Ver_1_20_2, PacketDirection.Serverbound, ConnectionState.Play, 0x14, MinecraftPacketType.SB_Play_KeepAlive);
-    }
-
-    private void Map1202Clientbound()
-    {
-        var version = MinecraftVersion.Ver_1_20_2;
-        var direction = PacketDirection.Clientbound;
-        
-        Map(version, direction, ConnectionState.Login, 0x00, MinecraftPacketType.CB_Login_Disconnect);
-        Map(version, direction, ConnectionState.Login, 0x01, MinecraftPacketType.CB_Login_EncryptionRequest);
-        Map(version, direction, ConnectionState.Login, 0x02, MinecraftPacketType.CB_Login_LoginSuccess);
-        Map(version, direction, ConnectionState.Login, 0x03, MinecraftPacketType.CB_Login_SetCompression);
-        Map(version, direction, ConnectionState.Login, 0x04, MinecraftPacketType.CB_Login_LoginPluginRequest);
-        
-        Map(version, direction, ConnectionState.Configuration, 0x02, MinecraftPacketType.CB_Config_FinishConfiguration);
-        Map(version, direction, ConnectionState.Configuration, 0x03, MinecraftPacketType.CB_Config_KeepAlive);
-        
-        Map(version, direction, ConnectionState.Play, 0x24, MinecraftPacketType.CB_Play_KeepAlive);
-    }
-    
-    private void Map1164Clientbound()
+    private void Map_1_16_4_Clientbound()
     {
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Login, 0x00, MinecraftPacketType.CB_Login_Disconnect);
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Login, 0x01, MinecraftPacketType.CB_Login_EncryptionRequest);
@@ -325,7 +375,7 @@ public class PacketIdentifier
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Clientbound, ConnectionState.Play, 0x5B, MinecraftPacketType.CB_Play_Tags);
     }
 
-    private void Map1164Serverbound()
+    private void Map_1_16_4_Serverbound()
     {
         Map(MinecraftVersion.Ver_1_16_4, PacketDirection.Serverbound, ConnectionState.Play, 0x10, MinecraftPacketType.SB_Play_KeepAlive);
     }
