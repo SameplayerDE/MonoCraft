@@ -1,5 +1,4 @@
 ﻿using ConsoleClient;
-using System;
 using MonoCraft.Net.Predefined.Enums;
 
 string address = "localhost";
