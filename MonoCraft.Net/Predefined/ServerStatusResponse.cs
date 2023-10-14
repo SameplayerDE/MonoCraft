@@ -11,8 +11,8 @@ public class ServerStatusResponse
     public ServerStatusResponsePlayerList PlayerList;
     //[JsonProperty("description")]
     //public ServerStatusResponseDescription Description;
-    [JsonProperty("favicon")]
-    public string FaviconBase64;
+    //[JsonProperty("favicon")]
+    //public string FaviconBase64;
 }
 
 public class ServerStatusResponseVersion

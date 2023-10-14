@@ -15,34 +15,13 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
-    private string _json;
     private ServerStatusResponse _response;
     private Texture2D _image;
     private SpriteFont _font;
-    private StatusChecker _checker;
     
-    public Game1()
+    public Game1(ServerStatusResponse response)
     {
-        
-        
-        string address = "MC.HYPIXEL.NET";
-        ushort port = 25565;
-
-        _checker = new StatusChecker();
-        _checker.StatusUpdated += r =>
-        {
-            Console.WriteLine(r.PlayerList.Online);
-            _response = r;
-        };
-        
-        _checker.Connect(address, port);
-        while (_checker.Response == null)
-        {
-    
-        }
-        byte[] imageBytes = Convert.FromBase64String(_checker.Response.FaviconBase64.Replace("data:image/png;base64,", ""));
-        File.WriteAllBytes("image.png", imageBytes);
-        
+        _response = response;
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;

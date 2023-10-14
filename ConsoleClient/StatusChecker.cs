@@ -22,17 +22,9 @@ namespace ConsoleClient
             ConnectionEstablished += () =>
             {
                 Handshake((int)MinecraftVersion.Ver_1_16_4);
-                StartStatusUpdateLoop();
+                SendRequestAsync();
+                ReadResponseAsync();
             };
-        }
-
-        private void StartStatusUpdateLoop()
-        {
-            SendRequestAsync();
-            ReadResponseAsync();
-            StatusUpdated?.Invoke(Response);
-            Disconnect();
-            ReConnect();
         }
 
         public void Handshake(int protocolVersion)
@@ -50,21 +42,29 @@ namespace ConsoleClient
         {
             var stream = new MemoryStream();
             stream.WriteVarInt(0x00);
-            GetStream().WriteAsync(stream.ToPacket().ToArray());
+            GetStream().Write(stream.ToPacket().ToArray());
         }
 
-        public void ReadResponseAsync()
+        public async void ReadResponseAsync()
         {
-            if (IsConnected && Available > 10)
+            while (IsConnected)
             {
-                int packetLength =  GetStream().ReadVarInt();
-                var buffer = new byte[packetLength];
-                GetStream().ReadAsync(buffer, 0, packetLength);
-                var stream = new MemoryStream(buffer);
-                int id =  stream.ReadVarInt();
-                JsonString =  stream.ReadString();
-                Response = JsonConvert.DeserializeObject<ServerStatusResponse>(JsonString);
+                if (IsConnected && Available > 10)
+                {
+                    int packetLength = GetStream().ReadVarInt();
+                    var buffer = new byte[packetLength];
+                    GetStream().Read(buffer, 0, packetLength);
+                    var stream = new MemoryStream(buffer);
+                    int id = stream.ReadVarInt();
+                    JsonString = stream.ReadString();
+                    Response = JsonConvert.DeserializeObject<ServerStatusResponse>(JsonString);
+                }
+                else
+                {
+                    await Task.Delay(1000);
+                }
             }
+            
         }
     }
 }
