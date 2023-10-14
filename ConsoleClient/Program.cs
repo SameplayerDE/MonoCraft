@@ -2,8 +2,14 @@
 using System;
 using MonoCraft.Net.Predefined.Enums;
 
-PerfClient client = new PerfClient(MinecraftVersion.Ver_1_20_2);
-client.Connect("localhost", 25565);
+string address = "localhost";
+ushort port = 25566;
+
+StatusChecker statusChecker = new StatusChecker();
+statusChecker.Connect(address, port);
+
+PerfClient client = new PerfClient((MinecraftVersion)statusChecker.Response.Version.ProtocolVersion);
+client.Connect(address, port);
 
 while (client.IsConnected)
 {
