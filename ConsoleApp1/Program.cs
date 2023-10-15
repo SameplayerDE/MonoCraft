@@ -34,11 +34,11 @@ namespace MinecraftServerStatus
 
         static async Task Main(string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            int totalDurationInSeconds = 60 * 60 * 24 * 7; // Gesamtdauer in Sekunden
+            int intervalInSeconds = 1000; // Intervall zwischen den Ausführungen in Sekunden
 
-            int totalDurationInSeconds = 60 * 60 * 10; // Gesamtdauer in Sekunden
-            int intervalInSeconds = 1 * 1000; // Intervall zwischen den Ausführungen in Sekunden
-
-            List<int> playerCount = new();
+            //List<int> playerCount = new();
 
             // Startzeitpunkt
             DateTime startTime = DateTime.Now;
@@ -46,13 +46,15 @@ namespace MinecraftServerStatus
             // Endzeitpunkt
             DateTime endTime = startTime.AddSeconds(totalDurationInSeconds);
 
-            Server server = new Server("gommehd.net", 25565);
+            Server gommehd = new Server("gommehd.net", 25565);
+            Server timolia = new Server("play.timolia.de", 25565);
 
             while (DateTime.Now < endTime)
             {
                 try
                 {
-                    PingAndQuery(server, playerCount);
+                    PingAndQuery(gommehd);//, playerCount);
+                    PingAndQuery(timolia);//, playerCount);
                 }
                 catch (Exception ex)
                 {
@@ -60,11 +62,12 @@ namespace MinecraftServerStatus
                 }
                 // Warten für das Intervall
                 Thread.Sleep(intervalInSeconds);
+                Console.Clear();
             }
 
         }
 
-        static void PingAndQuery(object state, List<int> playercount)
+        static void PingAndQuery(object state)//, List<int> playercount)
         {
             Server server = (Server)state;
 
@@ -148,9 +151,8 @@ namespace MinecraftServerStatus
                 writer.WriteLine(r.PlayerList.Online + "," + r.PlayerList.Max + "," + DateTime.Now.ToString("HH:mm:ss.fff") + "," + DateTime.Now.ToString("dd.MM.yyyy"));
             }
 
-            Console.Write($"[{r.PlayerList.Online} -> {DateTime.Now.ToString("HH:mm:ss.fff")}]: ".PadRight(30));
-
-
+            Console.Write($"[{DateTime.Now.ToString("HH:mm:ss.fff")}] {server.Name}".PadRight(35) + $"[{r.PlayerList.Online} / {r.PlayerList.Max}] ".PadRight(25));
+            
             //int starGroups = (int)Math.Ceiling((double)r.PlayerList.Online / 50);
             //
             //for (int i = 0; i < starGroups; i++)
@@ -158,16 +160,31 @@ namespace MinecraftServerStatus
             //    Console.Write("*");
             //}
 
+            int precision = 20;
+            double totalUsage = ((double)r.PlayerList.Online / r.PlayerList.Max);
+            int mapped = (int)(totalUsage * precision);
+          
             int stars = MapRange(r.PlayerList.Online, 0, r.PlayerList.Max, 0, 10);
             
-            for (int i = 0; i < stars; i++)
+            Console.Write("[");
+            
+            for (int i = 0; i < (int)mapped; i++)
             {
-                Console.Write("*");
+                Console.Write("#");
             }
             
+            for (int i = (int)mapped; i < precision; i++)
+            {
+                Console.Write("-");
+            }
+
+            double usage = totalUsage * 100.0;
+      
+            string formattedDouble = usage.ToString("F0").PadLeft(5);
+            Console.Write("]" + string.Format("{0}%", formattedDouble));
             Console.WriteLine();
 
-            playercount.Add(r.PlayerList.Online);
+            //playercount.Add(r.PlayerList.Online);
         }
 
         static int MapRange(int value, int fromMin, int fromMax, int toMin, int toMax)
