@@ -35,8 +35,10 @@ namespace MinecraftServerStatus
         static async Task Main(string[] args)
         {
 
-            int totalDurationInSeconds = 60 * 10; // Gesamtdauer in Sekunden
-            int intervalInSeconds = 100; // Intervall zwischen den Ausführungen in Sekunden
+            int totalDurationInSeconds = 60 * 60 * 10; // Gesamtdauer in Sekunden
+            int intervalInSeconds = 1 * 1000; // Intervall zwischen den Ausführungen in Sekunden
+
+            List<int> playerCount = new();
 
             // Startzeitpunkt
             DateTime startTime = DateTime.Now;
@@ -44,20 +46,25 @@ namespace MinecraftServerStatus
             // Endzeitpunkt
             DateTime endTime = startTime.AddSeconds(totalDurationInSeconds);
 
+            Server server = new Server("gommehd.net", 25565);
+
             while (DateTime.Now < endTime)
             {
-                // Führen Sie Ihre Methode hier aus.
-                PingAndQuery(new Server("gommehd.net", 25565));
-
-                Console.WriteLine("ping");
-
+                try
+                {
+                    PingAndQuery(server, playerCount);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
                 // Warten für das Intervall
                 Thread.Sleep(intervalInSeconds);
             }
 
         }
 
-        static void PingAndQuery(object state)
+        static void PingAndQuery(object state, List<int> playercount)
         {
             Server server = (Server)state;
 
@@ -128,15 +135,49 @@ namespace MinecraftServerStatus
                 }
             }
 
-            if (!File.Exists(server.Name + ".txt"))
+            if (!File.Exists(server.Name + ".csv"))
             {
-                using (File.Create(server.Name + ".txt")) { }
+                using (StreamWriter writer = new StreamWriter(File.Create(server.Name + ".csv")))
+                {
+                    writer.WriteLine("online,max,time,day");
+                }
             }
 
-            using (StreamWriter writer = File.AppendText(server.Name + ".txt"))
+            using (StreamWriter writer = File.AppendText(server.Name + ".csv"))
             {
-                writer.WriteLine(r.PlayerList.Online);
+                writer.WriteLine(r.PlayerList.Online + "," + r.PlayerList.Max + "," + DateTime.Now.ToString("HH:mm:ss.fff") + "," + DateTime.Now.ToString("dd.MM.yyyy"));
             }
+
+            Console.Write($"[{r.PlayerList.Online} -> {DateTime.Now.ToString("HH:mm:ss.fff")}]: ".PadRight(30));
+
+
+            //int starGroups = (int)Math.Ceiling((double)r.PlayerList.Online / 50);
+            //
+            //for (int i = 0; i < starGroups; i++)
+            //{
+            //    Console.Write("*");
+            //}
+
+            int stars = MapRange(r.PlayerList.Online, 0, r.PlayerList.Max, 0, 10);
+            
+            for (int i = 0; i < stars; i++)
+            {
+                Console.Write("*");
+            }
+            
+            Console.WriteLine();
+
+            playercount.Add(r.PlayerList.Online);
+        }
+
+        static int MapRange(int value, int fromMin, int fromMax, int toMin, int toMax)
+        {
+            // Sicherstellen, dass der Wert im ursprünglichen Bereich (fromMin bis fromMax) liegt
+            value = Math.Max(value, fromMin);
+            value = Math.Min(value, fromMax);
+
+            // Lineare Abbildung des Werts auf den neuen Bereich (toMin bis toMax)
+            return (int)Math.Round((double)(value - fromMin) / (fromMax - fromMin) * (toMax - toMin) + toMin);
         }
 
         class Server
